@@ -9,7 +9,7 @@ let xxx = class {
 
     notPublicMethod() {}
 
-    publucMethod(x, y, result) {
+    publicMethod(x, y, result) {
         if (result.isResult()) {
             result.setData(x + y);
             result.setMessage('SUPER');
@@ -17,12 +17,12 @@ let xxx = class {
         }
     }
 
-    publucMethodException(result) {
+    publicMethodException(result) {
             throw new Error('Some error');
     }
 
     apiMethods() {
-        return {publucMethod: true, publucMethodException: true};
+        return {publicMethod: true, publicMethodException: true};
     }
 };
 
@@ -44,7 +44,7 @@ describe('Test client', () => {
     });
 
     it('Check public remote method', () => {
-        assert.ok(wsdirect.xxxAction.publucMethod instanceof Function);
+        assert.ok(wsdirect.xxxAction.publicMethod instanceof Function);
     });
 
     it('Check not public remote method', () => {
@@ -54,7 +54,7 @@ describe('Test client', () => {
 
 
     it('Call public remote method with exception', (done) => {
-        wsdirect.xxxAction.publucMethodException((res, e) => {
+        wsdirect.xxxAction.publicMethodException((res, e) => {
             assert.ok(!e.success);
             assert.ok(e.msg == 'Some error');
             done();
@@ -62,7 +62,7 @@ describe('Test client', () => {
     });
 
     it('Call public remote method', (done) => {
-        wsdirect.xxxAction.publucMethod(5, 3, (res, e) => {
+        wsdirect.xxxAction.publicMethod(5, 3, (res, e) => {
             assert.ok(e.success);
             assert.ok(res === 8);
             done();
@@ -75,7 +75,7 @@ describe('Test client', () => {
 
             notPublicMethod() {}
 
-            publucMethod(x, y, result) {
+            publicMethod(x, y, result) {
                 if (result.isResult()) {
                     result.setData(x + y);
                     result.setMessage('SUPER');
@@ -83,12 +83,12 @@ describe('Test client', () => {
                 }
             }
 
-            publucMethodException(result) {
+            publicMethodException(result) {
                     throw new Error('Some error');
             }
 
             apiMethods() {
-                return {publucMethod: true, publucMethodException: true};
+                return {publicMethod: true, publicMethodException: true};
             }
         };
 

@@ -27,7 +27,7 @@ var SomePublicAPI = class {
 
     notPublicMethod() {}
 
-    publucMethod(x, y, result) {
+    publicMethod(x, y, result) {
         if (result.isResult()) {
             result.setData(x + y);
             result.setMessage('SUPER');
@@ -35,12 +35,12 @@ var SomePublicAPI = class {
         }
     }
 
-    publucMethodException(result) {
+    publicMethodException(result) {
             throw new Error('Some error');
     }
 
     apiMethods() {
-        return {publucMethod: true, publucMethodException: true};
+        return {publicMethod: true, publicMethodException: true};
     }
 };
 
@@ -85,7 +85,7 @@ index.html
         <script src="http://localhost:3500/ws.direct.client.js"></script>
         <script src="http://localhost:3500/initMyAPI.js"></script>
         <script>
-            wsdirect.PubAPI.publucMethod(2,3, function(res, event) {
+            wsdirect.PubAPI.publicMethod(2,3, function(res, event) {
                 document.getElementById('result').innerHTML = `Result: ${res}`;
             });
         </script>

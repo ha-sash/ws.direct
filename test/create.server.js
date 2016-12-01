@@ -62,7 +62,7 @@ describe('Create APIManager object', () => {
 
         let xxx = class {
 
-            publucMethod(x, y, result) {
+            publicMethod(x, y, result) {
                 if (result.isResult()) {
                     result.setData(x + y);
                     result.send();
@@ -70,12 +70,12 @@ describe('Create APIManager object', () => {
             }
 
             apiMethods() {
-                return {publucMethod: true};
+                return {publicMethod: true};
             }
         }
         let xxxObject = new xxx();
         api.add('xxxAction', xxxObject);
-        assert.deepEqual(api.getMethods('xxxAction'), [ { method: 'publucMethod', arguments: [ 'x', 'y' ] } ]);
+        assert.deepEqual(api.getMethods('xxxAction'), [ { method: 'publicMethod', arguments: [ 'x', 'y' ] } ]);
     });
 
 });
