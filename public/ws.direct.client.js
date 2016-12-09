@@ -47,16 +47,25 @@ var WSDirectClient = function(config, socketio) {
     socket.on('message', function(msg) {
         var handler, info, callbacks;
         if (msg.event !== undefined && msg.id !== undefined && handleResponceEventName[msg.event] && (handler = handlers[msg.id].handler)) {
-            handler(msg.result, msg);
+
             info = handlers[msg.id].info;
+
+            if (!(handlers[msg.id].reject instanceof Function)) {
+                handler(msg.result, msg);
+            } else if (msg.success) {
+                handler(msg.result);
+            } else {
+                handlers[msg.id].reject(msg);
+            }
 
             callbacks = listeners[info.apiManager.getResultEventNameByMethodContext(info, 'response')];
 
             if (callbacks && callbacks.length > 0) {
-                for (var i=0;i<callbacks.length;i++) {
+                for (var i = 0; i < callbacks.length; i++) {
                     callbacks[0](msg.result, msg, info);
                 }
             }
+
 
             delete handlers[msg.id];
             delete handler;
@@ -105,11 +114,13 @@ var WSDirectClient = function(config, socketio) {
      * @param id {string} - call id
      * @param fn {function} - callback
      * @param methodInfo {object}
+     * @param reject {function}/undefined
      */
-    this.addHandler = function(id, fn, methodInfo) {
+    this.addHandler = function(id, fn, methodInfo, reject) {
         handlers[id] = {
             handler: (fn instanceof Function) ? fn : function(){},
-            info: methodInfo
+            info: methodInfo,
+            reject: reject
         };
     }
 
@@ -144,7 +155,8 @@ var WSDirectClient = function(config, socketio) {
         var method = function() {
             var argsLength = this.config.arguments.length,
                 realArgs   = Array.prototype.slice.call(arguments, 0, argsLength),
-                callback   = arguments[argsLength];
+                callback   = arguments[argsLength],
+                t = this;
 
             if (this.config.arguments.length != realArgs.length) {
                 throw new Error('Necessary amount of arguments ' + argsLength);
@@ -164,8 +176,21 @@ var WSDirectClient = function(config, socketio) {
                     args:   realArgs
                 }
 
-                this.apiManager.addHandler(id, callback, this);
-                socket.send(remoteEvent);
+                try {
+                    if (callback instanceof Function) {
+                        this.apiManager.addHandler(id, callback, this);
+                        socket.send(remoteEvent);
+                    } else {
+                        return new Promise(function (resolve, reject) {
+                            t.apiManager.addHandler(id, resolve, t, reject);
+                            socket.send(remoteEvent);
+                        });
+                    }
+                } catch(e) {
+                    this.apiManager.addHandler(id, callback, this);
+                    socket.send(remoteEvent);
+                }
+
             }
         }.bind(context);
 

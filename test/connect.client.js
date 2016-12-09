@@ -69,6 +69,24 @@ describe('Test client', () => {
         });
     });
 
+    it('Call public remote method with promise', (done) => {
+        wsdirect.xxxAction.publicMethod(5, 4).then(res => {
+            assert.ok(res === 9);
+            done();
+        });
+    });
+
+    it('Call public remote method with exception with promise', (done) => {
+        wsdirect.xxxAction.publicMethodException().then(() => {
+            assert.ok(false);
+        }).catch(e => {
+            assert.ok(!e.success);
+            assert.ok(e.msg == 'Some error');
+            done();
+        });
+    });
+
+    /*
     it('Demo test', () => {
 
         var SomePublicAPI = class {
@@ -96,5 +114,6 @@ describe('Test client', () => {
         var clientInitScript = api.getScript();
         //console.log(clientInitScript, 'jopo');
     });
+    */
 
 });

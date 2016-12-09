@@ -85,8 +85,19 @@ index.html
         <script src="http://localhost:3500/ws.direct.client.js"></script>
         <script src="http://localhost:3500/initMyAPI.js"></script>
         <script>
-            wsdirect.PubAPI.publicMethod(2,3, function(res, event) {
-                document.getElementById('result').innerHTML = `Result: ${res}`;
+            wsdirect.PubAPI.publicMethod(2, 3, function(res, event) {
+                if (event.success) {
+                    document.getElementById('result').innerHTML = `Result: ${res}`;
+                } else {
+                    document.getElementById('result').innerHTML = `Error: ${e.msg}`;
+                }
+            });
+
+
+            wsdirect.PubAPI.publicMethod(2, 3).then(function(res) {
+                alert(`Promise result: ${res}`);
+            }).catch(function(e) {
+                alert(`Promise error: ${e.msg}`);
             });
         </script>
     </head>
