@@ -1,7 +1,7 @@
 {
   "name": "ws.direct",
   "version": "1.0.3",
-  "description": "RCP via WebSocket, access to the objects on server. And implementation of the Ext.direct via WebSocket.",
+  "description": "RPC via WebSocket, access to the objects on server. And implementation of the Ext.direct via WebSocket.",
   "main": "index.js",
   "scripts": {
     "test": "mocha"
@@ -13,7 +13,7 @@
   "keywords": [
     "websocket",
     "ext.direct",
-    "rcp",
+    "rpc",
     "server object access"
   ],
   "author": "Aleksander Moskvitin <moskvandr@gmail.com>",
