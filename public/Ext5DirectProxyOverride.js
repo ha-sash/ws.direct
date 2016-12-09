@@ -28,7 +28,7 @@ Ext.define('Ext5DirectProxyOverride', {
                     if (!api[fn].hasOwnProperty('directCfg')) {
                         api[fn].directCfg = {
                             method: {
-                                getArgs: Ext.create('Ext.direct.RemotingMethod', {len: 1, params: {}, metadata: {}}).getArgs,
+                                getArgs: Ext.create('Ext.direct.RemotingMethod', {len: 1, params: {}}).getArgs,
                                 getLen: oneFn,
                                 getOrdered: trueFn
                             }

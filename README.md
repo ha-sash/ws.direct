@@ -39,8 +39,31 @@ var SomePublicAPI = class {
             throw new Error('Some error');
     }
 
+    //Example API for ExtJs GridPanel:
+    getListOfCharacters(params, result) {
+        if (result.isResult()) {
+            result.setData([
+                { name: 'Eddie Valiant'},
+                { name: 'Roger Rabbit'},
+                { name: 'Jessica Rabbit'},
+                { name: 'Judge Doom'},
+                { name: 'Baby Herman'},
+                { name: 'Benny the Cab'},
+                { name: 'Dolores'},
+                { name: 'R.K. Maroon'},
+                { name: 'Marvin Acme'},
+                { name: 'Lt. Santino'},
+                { name: 'Teddy Valiant'},
+                { name: 'Angelo'},
+                { name: 'Bongo the Gorilla'},
+                { name: 'Lena Hyena'},
+                { name: 'Toon Bullets'}
+            ]).send();
+        }
+    }
+
     apiMethods() {
-        return {publicMethod: true, publicMethodException: true};
+        return {publicMethod: true, publicMethodException: true, getListOfCharacters: true};
     }
 };
 
@@ -109,6 +132,66 @@ index.html
     </body>
 </html>
 
+```
+
+### ExtJS 5.1 Grid example:
+```html
+<html>
+    <head>
+        <script src="http://localhost:3500/socket.io/socket.io.js"></script>
+        <script src="http://localhost:3500/ws.direct.client.js"></script>
+        <script src="http://localhost:3500/initMyAPI.js"></script>
+        <script src="http://cdn.sencha.com/ext/gpl/5.1.0/build/ext-all-debug.js"></script>
+        <script src="http://cdn.sencha.com/ext/gpl/5.1.0/build/packages/ext-theme-crisp/build/ext-theme-crisp.js"></script>
+        <link rel="stylesheet" href="http://cdn.sencha.com/ext/gpl/5.1.0/build/packages/ext-theme-crisp/build/resources/ext-theme-crisp-all.css">
+        <script src="http://localhost:3500/Ext5DirectProxyOverride.js"></script>
+
+        <script>
+        
+            Ext.define('App.view.Viewport', {
+                extend: 'Ext.container.Viewport',
+                items: {
+                    xtype: 'gridpanel',
+                    title: 'The list of characters',
+                    store: {
+                        autoLoad: true,
+                        proxy: {
+                            type: 'direct',
+                            api: {
+                                read: 'wsdirect.PubAPI.getListOfCharacters'
+                            }
+                        },
+                        fields: [
+                            {
+                                name: 'name',
+                                type: 'string'
+                            }
+                        ]
+                    },
+                    columns: [
+                        {
+                            xtype: 'gridcolumn',
+                            flex: 1,
+                            dataIndex: 'name',
+                            text: 'Name'
+                        }
+                    ]
+                }
+            });
+
+            Ext.application({
+                name: 'App',
+                launch: function() {
+                    Ext.create('App.view.Viewport');
+                }
+            });
+
+        </script>
+    </head>
+
+    <body>
+    </body>
+</html>
 ```
 
 
