@@ -5,7 +5,7 @@ The library is made by analogy, ext.direct. If you use override for direct.proxy
 ## Requirements
  - [nodejs](http://nodejs.org)
  - [npm](http://npmjs.org)
- - [socket.io](http://http://socket.io)
+ - [socket.io](http://socket.io)
 
 
 ## Installation
