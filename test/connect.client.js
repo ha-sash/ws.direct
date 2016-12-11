@@ -86,6 +86,25 @@ describe('Test client', () => {
         });
     });
 
+    it('Subscribe to the execution result', (done) => {
+        let callCounter = 0;
+
+        wsdirect.xxxAction.publicMethod.on('response', (result, event, client) => {
+            callCounter++;
+
+            if (callCounter === 3) {
+                assert.ok(true);
+                done();
+            }
+        });
+
+        wsdirect.xxxAction.publicMethod(1,2);
+        wsdirect.xxxAction.publicMethod(3,4);
+        wsdirect.xxxAction.publicMethod(5,6);
+    });
+
+
+
     /*
     it('Demo test', () => {
 

@@ -108,6 +108,12 @@ index.html
         <script src="http://localhost:3500/ws.direct.client.js"></script>
         <script src="http://localhost:3500/initMyAPI.js"></script>
         <script>
+            //callback on all results
+            wsdirect.PubAPI.publicMethod.on('response', function(result, event, client) {
+                console.log('Callback on all results: ', result, event, client);
+            });
+
+            //callback
             wsdirect.PubAPI.publicMethod(2, 3, function(res, event) {
                 if (event.success) {
                     document.getElementById('result').innerHTML = `Result: ${res}`;
@@ -116,7 +122,7 @@ index.html
                 }
             });
 
-
+            //promise - the browser must support the promises, or need to add something...
             wsdirect.PubAPI.publicMethod(2, 3).then(function(res) {
                 alert(`Promise result: ${res}`);
             }).catch(function(e) {
