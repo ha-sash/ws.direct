@@ -81,6 +81,7 @@ var server = http.createServer(function (req, res) {
     var fs = require('fs');
     var alias = {
         '/socket.io/socket.io.js': `${__dirname}/node_modules/socket.io-client/dist/socket.io.js`,
+        '/Ext5DirectProxyOverride.js': wsdirect.getPublicPath() + '/Ext5DirectProxyOverride.js',
         '/ws.direct.client.js': wsdirect.getPublicPath() + '/ws.direct.client.js',
         '/': `${__dirname}/index.html`
     };
