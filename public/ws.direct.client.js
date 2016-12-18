@@ -10,6 +10,7 @@ var WSDirectClient = function(config, socketio) {
     var defaultNamespace = 'WSDirectAPI';
     var defaultApiCallEventName = 'api:call';
     var defaultApiResponseEventName = 'api:response';
+    var defaultCookieEventName = 'api:setcookie';
     var socket = socketio;
     var listeners = {};
     var me = this;
@@ -46,6 +47,7 @@ var WSDirectClient = function(config, socketio) {
 
     socket.on('message', function(msg) {
         var handler, info, callbacks;
+
         if (msg.event !== undefined && msg.id !== undefined && handleResponceEventName[msg.event] && (handler = handlers[msg.id].handler)) {
 
             info = handlers[msg.id].info;
@@ -71,7 +73,34 @@ var WSDirectClient = function(config, socketio) {
             delete handler;
             delete info;
         }
+
+        if (msg.event !== undefined && msg.event === defaultCookieEventName && navigator.cookieEnabled) {
+            setCookie(msg);
+        }
     });
+
+    var setCookie = function(msg) {
+
+        var c, value = encodeURIComponent(msg.result), opt = msg.options || {}, d = new Date();
+
+        if (opt.expires instanceof Date) {
+            opt.expires = opt.expires.toUTCString();
+        } else if (typeof opt.expires === 'number' && opt.expires) {
+            d.setTime(d.getTime() + opt.expires);
+            opt.expires = d.toUTCString();
+        }
+
+        var c = msg.cookieName + '=' + value;
+
+        for (var prop in opt) {
+            c += '; ' + prop;
+            if (opt[prop] !== true) {
+                c += '=' + opt[prop];
+            }
+        }
+
+        document.cookie = c;
+    }
 
     //socket.on('connect', function(msg) {});
     //socket.on('disconnect', function(msg) {});
