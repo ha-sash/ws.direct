@@ -26,14 +26,41 @@ let xxx = class {
     }
 };
 
-describe('Test client', () => {
-
-    let api;
+describe('Test simple connection client', () => {
+    let api, skio;
 
     before(() => {
-        let skio = socketio.listen(port), xxxObject = new xxx();
+        skio = socketio.listen(port), xxxObject = new xxx();
+        api = new APIManager(skio, {url: `http://localhost:${port}`, namespace: 'wsdirectsimple'});
+        api.add('xxxAction', xxxObject);
+    });
+
+    after(()=> {
+        skio.close();
+    });
+
+    it('Simple connect client', (done) => {
+        var WSDClient = new WSDirectClient(`http://localhost:${port}`);
+        WSDClient.onInit = function() {
+            if (wsdirectsimple !== undefined) {
+                done();
+            }
+        }
+    });
+});
+
+describe('Test client', () => {
+
+    let api, skio;
+
+    before(() => {
+        skio = socketio.listen(port), xxxObject = new xxx();
         api = new APIManager(skio, {url: `http://localhost:${port}`});
         api.add('xxxAction', xxxObject);
+    });
+
+    after(()=> {
+        skio.close();
     });
 
     it('Connect client', (done) => {
@@ -50,8 +77,6 @@ describe('Test client', () => {
     it('Check not public remote method', () => {
         assert.ok(wsdirect.xxxAction.notPublicMethod === undefined);
     });
-
-
 
     it('Call public remote method with exception', (done) => {
         wsdirect.xxxAction.publicMethodException((res, e) => {
@@ -136,3 +161,4 @@ describe('Test client', () => {
     */
 
 });
+

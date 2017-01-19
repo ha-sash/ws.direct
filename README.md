@@ -107,28 +107,30 @@ index.html
     <head>
         <script src="http://localhost:3500/socket.io/socket.io.js"></script>
         <script src="http://localhost:3500/ws.direct.client.js"></script>
-        <script src="http://localhost:3500/initMyAPI.js"></script>
         <script>
-            //callback on all results
-            wsdirect.PubAPI.publicMethod.on('response', function(result, event, client) {
-                console.log('Callback on all results: ', result, event, client);
-            });
+            var client = new WSDirectClient('http://localhost:8811/');
+            client.onInit = function() {
+                //callback on all results
+                wsdirect.PubAPI.publicMethod.on('response', function(result, event, client) {
+                    console.log('Callback on all results: ', result, event, client);
+                });
 
-            //callback
-            wsdirect.PubAPI.publicMethod(2, 3, function(res, event) {
-                if (event.success) {
-                    document.getElementById('result').innerHTML = `Result: ${res}`;
-                } else {
-                    document.getElementById('result').innerHTML = `Error: ${e.msg}`;
-                }
-            });
+                //callback
+                wsdirect.PubAPI.publicMethod(2, 3, function(res, event) {
+                    if (event.success) {
+                        document.getElementById('result').innerHTML = `Result: ${res}`;
+                    } else {
+                        document.getElementById('result').innerHTML = `Error: ${e.msg}`;
+                    }
+                });
 
-            //promise - the browser must support the promises, or need to add something...
-            wsdirect.PubAPI.publicMethod(2, 3).then(function(res) {
-                alert(`Promise result: ${res}`);
-            }).catch(function(e) {
-                alert(`Promise error: ${e.msg}`);
-            });
+                //promise - the browser must support the promises, or need to add something...
+                wsdirect.PubAPI.publicMethod(2, 3).then(function(res) {
+                    alert(`Promise result: ${res}`);
+                }).catch(function(e) {
+                    alert(`Promise error: ${e.msg}`);
+                });
+            }
         </script>
     </head>
 
@@ -154,7 +156,6 @@ index.html
         <script src="http://localhost:3500/Ext5DirectProxyOverride.js"></script>
 
         <script>
-        
             Ext.define('App.view.Viewport', {
                 extend: 'Ext.container.Viewport',
                 items: {
@@ -191,8 +192,7 @@ index.html
                 launch: function() {
                     Ext.create('App.view.Viewport');
                 }
-            });
-
+            });        
         </script>
     </head>
 

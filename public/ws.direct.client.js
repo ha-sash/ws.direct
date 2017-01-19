@@ -10,10 +10,12 @@ var WSDirectClient = function(config, socketio) {
     var defaultNamespace = 'WSDirectAPI';
     var defaultApiCallEventName = 'api:call';
     var defaultApiResponseEventName = 'api:response';
+    var defaultApiInitEventName = 'api:init';
     var defaultCookieEventName = 'api:setcookie';
     var socket = socketio;
     var listeners = {};
     var me = this;
+    var inited = false;
 
     /**
      * Event name response for each provider
@@ -39,6 +41,8 @@ var WSDirectClient = function(config, socketio) {
 
     if (!(socket instanceof io.Socket) && config instanceof Object && config.url) {
         socket = io.connect(config.url);
+    } else if (!(socket instanceof io.Socket) && typeof config === 'string') {
+        socket = io.connect(config);
     }
 
     if (!(socket instanceof io.Socket)) {
@@ -77,6 +81,12 @@ var WSDirectClient = function(config, socketio) {
         if (msg.event !== undefined && msg.event === defaultCookieEventName && navigator.cookieEnabled) {
             setCookie(msg);
         }
+
+        if (msg.event !== undefined && msg.event === defaultApiInitEventName && msg.config) {
+            me.addProvider(msg.config);
+            me.onInit();
+            inited = true;
+        }
     });
 
     var setCookie = function(msg) {
@@ -101,9 +111,6 @@ var WSDirectClient = function(config, socketio) {
 
         document.cookie = c;
     }
-
-    //socket.on('connect', function(msg) {});
-    //socket.on('disconnect', function(msg) {});
 
     /**
      * Add method to API
@@ -288,8 +295,8 @@ var WSDirectClient = function(config, socketio) {
      * @return {boolean}
      */
     this.addProvider = function(conf) {
-        if (conf instanceof Object && config.actions && config.actions instanceof Object) {
-            var ns = this.ns(config.namespace || defaultNamespace);
+        if (conf instanceof Object && conf.actions && conf.actions instanceof Object) {
+            var ns = this.ns(conf.namespace || defaultNamespace);
 
             if (conf.calleventname === undefined) {
                 conf.calleventname = this.getDefaultApiCallEventName();
@@ -334,9 +341,23 @@ var WSDirectClient = function(config, socketio) {
         return (S4() + S4() + "-" + S4() + "-4" + S4().substr(0,3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
     };
 
-    if (config !== undefined) {
-        this.addProvider(config);
+    this.onInit = function() {};
+
+    if (typeof config === 'string') {
+        socket.on('connect', function(msg) {
+            if (!inited) {
+                socket.send({event: defaultApiInitEventName});
+            }
+        });
+    } else {
+        if (config !== undefined) {
+            this.addProvider(config);
+            this.onInit();
+            inited = true;
+        }
     }
+
+    //socket.on('disconnect', function(msg) {});
 
 };
 
