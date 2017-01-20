@@ -34,6 +34,9 @@ var WSDirectClient = function(config, socketio) {
     }
 
     try {
+        if (config === undefined && window !== undefined) {
+            config = `${location.protocol}//${location.host}`;
+        }
         this.global = window;
     } catch (e) {
         this.global = global;
