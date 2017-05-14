@@ -1,6 +1,6 @@
 {
   "name": "ws.direct",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "RPC via WebSocket, access to the objects on server. And implementation of the Ext.direct via WebSocket.",
   "main": "index.js",
   "scripts": {
