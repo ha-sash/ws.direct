@@ -81,8 +81,12 @@ var WSDirectClient = function(config, socketio) {
             delete info;
         }
 
-        if (msg.event !== undefined && msg.event === defaultCookieEventName && navigator && navigator.cookieEnabled && document) {
-            setCookie(msg);
+        try {
+            if (msg.event !== undefined && msg.event === defaultCookieEventName && navigator && navigator.cookieEnabled && document) {
+                setCookie(msg);
+            }
+        } catch (err) {
+
         }
 
         if (msg.event !== undefined && msg.event === defaultApiInitEventName && msg.config) {
