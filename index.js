@@ -1,4 +1,3 @@
-//const APIManager = require('./lib/APIManager');
 const APIManager = require('./dist/APIManager').APIManager;
 
 
