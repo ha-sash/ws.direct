@@ -1,6 +1,6 @@
 {
   "name": "ws.direct",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "RPC via WebSocket, access to the objects on server. And implementation of the Ext.direct via WebSocket.",
   "main": "index.js",
   "scripts": {
@@ -19,7 +19,9 @@
   "author": "Aleksander Moskvitin <moskvandr@gmail.com>",
   "license": "ISC",
   "devDependencies": {
+    "@types/socket.io": "^1.4.31",
     "mocha": "^3.2.0",
-    "socket.io": "^1.7.1"
-  }
+    "socket.io": "^2.0.3"
+  },
+  "dependencies": {}
 }

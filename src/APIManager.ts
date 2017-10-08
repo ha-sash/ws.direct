@@ -1,0 +1,256 @@
+import * as SocketIO from "socket.io";
+import * as APIError from "./APIErrors";
+import { WSConfig } from "./WSConfig";
+import { WSResponse } from "./WSResponse";
+
+interface Method {
+    method: string;
+    arguments: string[];
+}
+
+export class APIManager {
+
+    public config: WSConfig;
+    public actions: {[action: string]: any} = {};
+    public resultObject = WSResponse;
+    private apiConfigCache: any;
+    private errors: {[k: string]: any} = APIError;
+
+    public get url() {
+        return this.config.url;
+    }
+
+    public get sessionSecret() {
+        return this.config.sessionSecret;
+    }
+
+    public get sessionCookieName() {
+        return this.config.sessionCookieName;
+    }
+
+    public get browserSocketVariableName() {
+        return this.config.browserSocketVariableName;
+    }
+
+    public get responseEventName() {
+        return this.config.responseEventName;
+    }
+
+    public get setCookieEventName() {
+        return this.config.setCookieEventName;
+    }
+
+    public get errorEventName() {
+        return this.config.errorEventName;
+    }
+
+    public get callEventName() {
+        return this.config.callEventName;
+    }
+
+    public get initEventName() {
+        return this.config.initEventName;
+    }
+
+    public get namespace() {
+        return this.config.namespace;
+    }
+
+    constructor(public io: SocketIO.Server, config: any = {}) {
+        this.config = new WSConfig(config);
+        this.apiConfigCache = this.getApiConfig();
+        this.initListeners();
+    }
+
+    public add(actionName: any, object: any): void {
+        if (actionName instanceof Object && object === undefined) {
+            for (const i in actionName) {
+                if (actionName.hasOwnProperty(i)) {
+                    this.add(i, actionName[i]);
+                }
+            }
+        } else if (this.actions[actionName] === undefined && object !== undefined && object instanceof Object) {
+            if (object.apiMethods === undefined || typeof object.apiMethods !== "function") {
+                throw new Error(`API ('${actionName}) object has to have a method "apiMethods"`);
+            }
+
+            this.actions[actionName] = object;
+        }
+    }
+
+    public sendResponse(response: WSResponse, incomingMessage: any, socket: SocketIO.Socket, eventName: string): void {
+        const result = {
+            event:   eventName || this.config.responseEventName,
+            id:      incomingMessage.id,
+            result:  response.getData(),
+            success: response.isSuccess(),
+            msg:     response.getMessage(),
+        };
+
+        socket.json.send({...response.getExtraParams(), ...result});
+    }
+
+    public sendError(err: any, incomingMessage: any, socket: SocketIO.Socket) {
+        let msg: any = {};
+        if (err instanceof Object) {
+            msg = err;
+        } else if (typeof err === "string" && this.errors[err]) {
+            const tmpl = this.errors[err];
+            let text = tmpl.msg;
+
+            for (const i in msg) {
+                if (msg.hasOwnProperty(i)) {
+                    text = text.replace(`{${i}`, msg[i]);
+                }
+            }
+
+            msg = {
+                type: tmpl.type,
+                msg: tmpl.msg,
+                code: err,
+            };
+        }
+
+        msg.id = incomingMessage.id;
+        socket.json.send(msg);
+    }
+
+    public getScript() {
+        const script = [];
+        script.push(
+            "(function() {",
+            "var WSDClient = new WSDirectClient(",
+            JSON.stringify(this.getApiConfig()),
+            this.browserSocketVariableName === null ? "" : `, ${this.browserSocketVariableName}`,
+            ");",
+            "})();",
+        );
+
+        return script.join("");
+    }
+
+    private validateMessage(incomingMessage: any, socket: SocketIO.Socket): boolean {
+        let result = false;
+        let err: string | false = false;
+
+        if (incomingMessage.id === undefined) {
+            err = "apiCallMsgIdNotFound";
+        } else if (incomingMessage.action === undefined) {
+            err = "apiCallMsgActionNotFound";
+        } else if (this.actions[incomingMessage.action] === undefined) {
+            err = "apiCallActionObjectNotFound";
+        } else if (incomingMessage.method === undefined) {
+            err = "apiCallMsgMethodNotFound";
+        } else if (incomingMessage.args === undefined) {
+            err = "apiCallMsgArgsNotFound";
+        } else if (!Array.isArray(incomingMessage.args)) {
+            err = "apiCallMsgArgsIsNotArray";
+        } else if (!this.isExistsActionMethod(incomingMessage.action, incomingMessage.method)) {
+            err = "apiCallMethodNotFoundInObject";
+        } else {
+            result = true;
+        }
+
+        if (err) {
+            this.sendError(err, incomingMessage, socket);
+        }
+
+        return result;
+    }
+
+    private isExistsActionMethod(actionName: string, methodName: string): boolean {
+        const action = this.actions[actionName];
+
+        if (!action) {
+            return false;
+        }
+
+        if (!action.apiMethods().hasOwnProperty(methodName)) {
+            return false;
+        }
+
+        return typeof action[methodName] === "function";
+    }
+
+    private onMessage(incomingMessage: any, socket: SocketIO.Socket) {
+        if (incomingMessage.event == this.config.callEventName) {
+            if (this.validateMessage(incomingMessage, socket)) {
+                const api = this.actions[incomingMessage.action];
+                const result = this.createResponse(incomingMessage, socket);
+
+                try {
+                    api[incomingMessage.method].apply(api, incomingMessage.args.concat(result));
+                } catch (e) {
+                    result.setSuccess(false).addParam("stack", e.stack || "").setMessage(e.message).send();
+                }
+            }
+        } else if (incomingMessage.event == this.config.initEventName) {
+            socket.json.send({event: this.config.initEventName, config: this.apiConfigCache});
+        }
+    }
+
+    private createResponse(incomingMessage: any, socket: SocketIO.Socket): WSResponse {
+        return new this.resultObject(this, incomingMessage, socket);
+    }
+
+    private getApiConfig(): any {
+        const result: any = {
+            namespace         : this.config.namespace,
+            url               : this.config.url,
+            calleventname     : this.config.callEventName,
+            responseeventname : this.config.responseEventName,
+            erroreventname    : this.config.errorEventName,
+            actions           : {},
+        };
+
+        for (const i in this.actions) {
+            if (this.actions.hasOwnProperty(i)) {
+                result.actions[i] = this.getMethods(this.actions[i]);
+            }
+        }
+
+        return result;
+    }
+
+    private getMethods(action: any): Method[] {
+        const methods: Method[] = [];
+        let publicMethods: {[k: string]: boolean};
+
+        if (typeof action === "string") {
+            action = this.actions[action];
+        }
+
+        publicMethods = action.apiMethods();
+
+        for (const methodName in publicMethods) {
+            if (publicMethods[methodName] && action[methodName] instanceof Function) {
+                const args = this.getArtuments(action[methodName]);
+                methods.push({
+                    method: methodName,
+                    arguments: args.slice(0, args.length - 1),
+                });
+            }
+        }
+
+        return methods;
+    }
+
+    private getArtuments(fn: any): string[] {
+        const strFn = fn.toString().replace(/^async /i, "");
+        const fnHeader = strFn.match(/^[a-z0-9_]+(?:\s|)\((.*?)\)/gi);
+
+        if (fnHeader && fnHeader[0]) {
+            return fnHeader[0].replace(/^[a-z0-9_]+(?:\s|)\(/gi, "").replace(/\)/g, "").split(", ");
+        }
+
+        return [];
+    }
+
+    private initListeners(): void {
+        this.io.sockets.on("connection", (socket) => {
+            socket.on("message", (incomingMessage) => {
+                this.onMessage(incomingMessage, socket);
+            });
+        });
+    }
+}
