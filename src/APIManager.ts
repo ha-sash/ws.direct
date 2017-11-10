@@ -58,11 +58,10 @@ export class APIManager {
 
     constructor(public io: SocketIO.Server, config: any = {}) {
         this.config = new WSConfig(config);
-        this.apiConfigCache = this.getApiConfig();
         this.initListeners();
     }
 
-    public add(actionName: any, object: any): void {
+    public add(actionName: any, object?: any): void {
         if (actionName instanceof Object && object === undefined) {
             for (const i in actionName) {
                 if (actionName.hasOwnProperty(i)) {
@@ -73,7 +72,6 @@ export class APIManager {
             if (object.apiMethods === undefined || typeof object.apiMethods !== "function") {
                 throw new Error(`API ('${actionName}) object has to have a method "apiMethods"`);
             }
-
             this.actions[actionName] = object;
         }
     }
@@ -185,6 +183,9 @@ export class APIManager {
                 }
             }
         } else if (incomingMessage.event == this.config.initEventName) {
+            if (!this.apiConfigCache) {
+                this.apiConfigCache = this.getApiConfig();
+            }
             socket.json.send({event: this.config.initEventName, config: this.apiConfigCache});
         }
     }

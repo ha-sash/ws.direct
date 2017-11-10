@@ -1,4 +1,3 @@
-/// <reference types="socket.io" />
 export declare class WSResponse {
     api: any;
     incomingMessage: any;

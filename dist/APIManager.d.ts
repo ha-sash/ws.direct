@@ -1,4 +1,3 @@
-/// <reference types="socket.io" />
 import { WSConfig } from "./WSConfig";
 import { WSResponse } from "./WSResponse";
 export declare class APIManager {
@@ -21,7 +20,7 @@ export declare class APIManager {
     readonly initEventName: string;
     readonly namespace: string;
     constructor(io: SocketIO.Server, config?: any);
-    add(actionName: any, object: any): void;
+    add(actionName: any, object?: any): void;
     sendResponse(response: WSResponse, incomingMessage: any, socket: SocketIO.Socket, eventName: string): void;
     sendError(err: any, incomingMessage: any, socket: SocketIO.Socket): void;
     getScript(): string;

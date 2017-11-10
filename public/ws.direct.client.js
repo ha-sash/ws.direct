@@ -1,4 +1,4 @@
-var WSDirectClient = function(config, socketio) {
+var WSDirectClient = function(config, socketio, onConnectCb) {
 
     /**
      * @property defaultNamespace {string}
@@ -29,6 +29,8 @@ var WSDirectClient = function(config, socketio) {
      */
     var handlers = {};
 
+    this.providers = {};
+
     if (!Function.prototype.bind) {
         throw new Error('Browser does not support function bind.');
     }
@@ -38,17 +40,19 @@ var WSDirectClient = function(config, socketio) {
             config = location.protocol + '//' + location.host;
         }
         this.global = window;
+        this.io = io;
     } catch (e) {
         this.global = global;
+        this.io = require('socket.io-client');
     }
 
-    if (!(socket instanceof io.Socket) && config instanceof Object && config.url) {
-        socket = io.connect(config.url);
-    } else if (!(socket instanceof io.Socket) && typeof config === 'string') {
-        socket = io.connect(config);
+    if (!(socket instanceof this.io.Socket) && config instanceof Object && config.url) {
+        socket = this.io.connect(config.url);
+    } else if (!(socket instanceof this.io.Socket) && typeof config === 'string') {
+        socket = this.io.connect(config);
     }
 
-    if (!(socket instanceof io.Socket)) {
+    if (!(socket instanceof this.io.Socket)) {
         throw new Error('Not the correct type of the adapter');
     }
 
@@ -91,8 +95,12 @@ var WSDirectClient = function(config, socketio) {
 
         if (msg.event !== undefined && msg.event === defaultApiInitEventName && msg.config) {
             me.addProvider(msg.config);
-            me.onInit();
+            if (config.autoPublicate !== false) {
+                me.publicToNamespace(msg.config);
+            }
+            me.onInit(me);
             inited = true;
+            config = msg.config;
         }
     });
 
@@ -205,8 +213,7 @@ var WSDirectClient = function(config, socketio) {
                 throw new Error('Necessary amount of arguments ' + argsLength);
             } else {
                 var socket = me.getSocket();
-
-                if (!(socket instanceof io.Socket)) {
+                if (!(socket instanceof me.io.Socket)) {
                     throw new Error('Not the correct type of the adapter');
                 }
 
@@ -302,28 +309,41 @@ var WSDirectClient = function(config, socketio) {
      * @return {boolean}
      */
     this.addProvider = function(conf) {
+        if (conf.calleventname === undefined) {
+            conf.calleventname = this.getDefaultApiCallEventName();
+        }
+
+        if (conf.responseeventname === undefined) {
+            conf.responseeventname = this.getDefaultApiResponseEventName();
+        }
+
         if (conf instanceof Object && conf.actions && conf.actions instanceof Object) {
-            var ns = this.ns(conf.namespace || defaultNamespace);
-
-            if (conf.calleventname === undefined) {
-                conf.calleventname = this.getDefaultApiCallEventName();
-            }
-
-            if (conf.responseeventname === undefined) {
-                conf.responseeventname = this.getDefaultApiResponseEventName();
-            }
-
-            for(var i in conf.actions) {
+            for (var i in conf.actions) {
                 var action = conf.actions[i];
-                ns[i] = {};
-                addMethods(action, ns[i], i, conf);
+                this.providers[i] = {};
+                addMethods(action, this.providers[i], i, conf);
             }
-
-            ns.$APIManager = this;
             return true;
         }
         return false;
     };
+
+    this.getProviders = function() {
+        return this.providers;
+    }
+
+    this.publicToNamespace = function(conf) {
+        var i, ns;
+        if (conf instanceof Object && conf.actions && conf.actions instanceof Object) {
+            ns = this.ns(conf.namespace || defaultNamespace);
+            for (i in this.providers) {
+                if (this.providers.hasOwnProperty(i)) {
+                    ns[i] = this.providers[i];
+                }
+            }
+            ns.$APIManager = this;
+        }
+    }
 
     /**
      * Get socket io connection adapter
@@ -348,9 +368,9 @@ var WSDirectClient = function(config, socketio) {
         return (S4() + S4() + "-" + S4() + "-4" + S4().substr(0,3) + "-" + S4() + "-" + S4() + S4() + S4()).toLowerCase();
     };
 
-    this.onInit = function() {};
+    this.onInit = onConnectCb ? onConnectCb : function() {} ;
 
-    if (typeof config === 'string') {
+    if (typeof config === 'string' || !config.actions) {
         socket.on('connect', function(msg) {
             if (!inited) {
                 socket.send({event: defaultApiInitEventName});
@@ -359,7 +379,10 @@ var WSDirectClient = function(config, socketio) {
     } else {
         if (config !== undefined) {
             this.addProvider(config);
-            this.onInit();
+            if (config.autoPublicate !== false) {
+                this.publicToNamespace(config);
+            }
+            this.onInit(this);
             inited = true;
         }
     }

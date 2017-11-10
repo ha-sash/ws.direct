@@ -10,7 +10,6 @@ class APIManager {
         this.resultObject = WSResponse_1.WSResponse;
         this.errors = APIError;
         this.config = new WSConfig_1.WSConfig(config);
-        this.apiConfigCache = this.getApiConfig();
         this.initListeners();
     }
     get url() {
@@ -151,6 +150,9 @@ class APIManager {
             }
         }
         else if (incomingMessage.event == this.config.initEventName) {
+            if (!this.apiConfigCache) {
+                this.apiConfigCache = this.getApiConfig();
+            }
             socket.json.send({ event: this.config.initEventName, config: this.apiConfigCache });
         }
     }
