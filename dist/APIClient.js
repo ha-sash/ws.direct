@@ -24,10 +24,6 @@ class APIClient {
             }
         });
     }
-    getActionTyped(actionName) {
-        const providers = this.client.getProviders();
-        return providers[actionName];
-    }
     getAction(actionName) {
         const providers = this.client.getProviders();
         return providers[actionName];

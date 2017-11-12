@@ -8,6 +8,7 @@ export declare class WSResponse {
     extra: {
         [k: string]: any;
     };
+    isSent: boolean;
     constructor(api: any, incomingMessage: any, socket: SocketIO.Socket);
     isResult(): true;
     setData(data: any): this;

@@ -142,7 +142,19 @@ class APIManager {
                 const api = this.actions[incomingMessage.action];
                 const result = this.createResponse(incomingMessage, socket);
                 try {
-                    api[incomingMessage.method].apply(api, incomingMessage.args.concat(result));
+                    const callResult = api[incomingMessage.method].apply(api, incomingMessage.args.concat(result));
+                    if (callResult instanceof Promise) {
+                        callResult.then((data) => {
+                            result.setData(data).send();
+                        }).catch((e) => {
+                            result.setSuccess(false).addParam("stack", e.stack || "").setMessage(e.message).send();
+                        });
+                    }
+                    else {
+                        if (!result.isSent) {
+                            result.setData(callResult).send();
+                        }
+                    }
                 }
                 catch (e) {
                     result.setSuccess(false).addParam("stack", e.stack || "").setMessage(e.message).send();

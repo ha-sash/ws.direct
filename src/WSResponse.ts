@@ -6,6 +6,7 @@ export class WSResponse {
     public success = true;
     public message = "Ok";
     public extra: {[k: string]: any} = {};
+    public isSent = false;
 
     constructor(public api: any, public incomingMessage: any, public socket: SocketIO.Socket) {}
 
@@ -50,7 +51,10 @@ export class WSResponse {
     }
 
     public send(): void {
-        this.api.sendResponse(this, this.incomingMessage, this.getSocket());
+        if (!this.isSent) {
+            this.api.sendResponse(this, this.incomingMessage, this.getSocket());
+            this.isSent = true;
+        }
     }
 
     public setCookie() {

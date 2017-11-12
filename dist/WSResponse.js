@@ -8,6 +8,7 @@ class WSResponse {
         this.success = true;
         this.message = "Ok";
         this.extra = {};
+        this.isSent = false;
     }
     isResult() {
         return true;
@@ -41,7 +42,10 @@ class WSResponse {
         return this.extra;
     }
     send() {
-        this.api.sendResponse(this, this.incomingMessage, this.getSocket());
+        if (!this.isSent) {
+            this.api.sendResponse(this, this.incomingMessage, this.getSocket());
+            this.isSent = true;
+        }
     }
     setCookie() {
         let msg = this.incomingMessage;
