@@ -115,7 +115,7 @@ var WSDirectClient = function(config, socketio, onConnectCb) {
             opt.expires = d.toUTCString();
         }
 
-        var c = msg.cookieName + '=' + value;
+        c = msg.cookieName + '=' + value;
 
         for (var prop in opt) {
             c += '; ' + prop;
@@ -125,7 +125,7 @@ var WSDirectClient = function(config, socketio, onConnectCb) {
         }
 
         document.cookie = c;
-    }
+    };
 
     /**
      * Add method to API
@@ -152,13 +152,14 @@ var WSDirectClient = function(config, socketio, onConnectCb) {
     /**
      * Get prefix for method name
      * @param context
+     * @param eventName
      * @return {string}
      */
     this.getResultEventNameByMethodContext = function(context, eventName) {
         var cfg = context.config, en = cfg.action + ':' + cfg.method;
         if (eventName !== undefined) en += ':' + eventName;
         return en;
-    }
+    };
 
     /**
      * Add callback for remote call
@@ -173,7 +174,7 @@ var WSDirectClient = function(config, socketio, onConnectCb) {
             info: methodInfo,
             reject: reject
         };
-    }
+    };
 
     /**
      * Add callback for permanent call processing.
@@ -187,7 +188,7 @@ var WSDirectClient = function(config, socketio, onConnectCb) {
                 listeners[eventName] = [];
             }
 
-            listeners[eventName].push(handler)
+            listeners[eventName].push(handler);
             return true;
         }
 
@@ -224,7 +225,7 @@ var WSDirectClient = function(config, socketio, onConnectCb) {
                     action: this.config.action,
                     method: this.config.method,
                     args:   realArgs
-                }
+                };
 
                 try {
                     if (callback instanceof Function) {
