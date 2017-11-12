@@ -27,6 +27,11 @@ export class APIClient {
         });
     }
 
+    public getActionTyped<T>(actionName: string): T {
+        const providers: any = this.client.getProviders();
+        return providers[actionName] as T;
+    }
+
     public getAction(actionName: string): { [method: string]: (...args: any[]) => Promise<any> } {
         const providers = this.client.getProviders();
         return providers[actionName];
