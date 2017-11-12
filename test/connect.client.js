@@ -17,12 +17,29 @@ let xxx = class {
         }
     }
 
+    publicMethodAutoSendResult(x, y, result) {
+        if (result.isResult()) {
+            return x + y
+        }
+    }
+
+    async publicAsyncMethodAutoSendResult(x, y, result) {
+        if (result.isResult()) {
+            return x + y
+        }
+    }
+
     publicMethodException(result) {
             throw new Error('Some error');
     }
 
     apiMethods() {
-        return {publicMethod: true, publicMethodException: true};
+        return {
+            publicMethod: true,
+            publicMethodException: true,
+            publicMethodAutoSendResult: true,
+            publicAsyncMethodAutoSendResult: true
+        };
     }
 };
 
@@ -128,6 +145,15 @@ describe('Test client', () => {
         wsdirect.xxxAction.publicMethod(5,6);
     });
 
+    it('Call public remote method with promise and auto send result', async () => {
+        const result = await wsdirect.xxxAction.publicMethodAutoSendResult(5, 4);
+        assert.equal(result, 9);
+    });
+
+    it('Call public remote async method with promise and auto send result', async () => {
+        const result = await wsdirect.xxxAction.publicAsyncMethodAutoSendResult(5, 4);
+        assert.equal(result, 9);
+    });
 
 
     /*
