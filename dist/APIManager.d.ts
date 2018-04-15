@@ -1,7 +1,7 @@
 import { WSConfig } from "./WSConfig";
 import { WSResponse } from "./WSResponse";
 export declare class APIManager {
-    io: SocketIO.Server;
+    io: any;
     config: WSConfig;
     actions: {
         [action: string]: any;
@@ -19,10 +19,10 @@ export declare class APIManager {
     readonly callEventName: string;
     readonly initEventName: string;
     readonly namespace: string;
-    constructor(io: SocketIO.Server, config?: any);
+    constructor(io: any, config?: any);
     add(actionName: any, object?: any): void;
-    sendResponse(response: WSResponse, incomingMessage: any, socket: SocketIO.Socket, eventName: string): void;
-    sendError(err: any, incomingMessage: any, socket: SocketIO.Socket): void;
+    sendResponse(response: WSResponse, incomingMessage: any, socket: any, eventName: string): void;
+    sendError(err: any, incomingMessage: any, socket: any): void;
     getScript(): string;
     private validateMessage(incomingMessage, socket);
     private isExistsActionMethod(actionName, methodName);

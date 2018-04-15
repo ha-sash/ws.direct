@@ -57,7 +57,7 @@ var WSDirectClient = function(config, socketio, onConnectCb) {
     }
 
     socket.on('message', function(msg) {
-        var handler, info, callbacks;
+        var handler, info, callbacks, e;
 
         if (msg.event !== undefined && msg.id !== undefined && handleResponceEventName[msg.event] && (handler = handlers[msg.id].handler)) {
 
@@ -68,7 +68,9 @@ var WSDirectClient = function(config, socketio, onConnectCb) {
             } else if (msg.success) {
                 handler(msg.result);
             } else {
-                handlers[msg.id].reject(msg);
+                e = new Error(msg.msg);
+                e.response = msg;
+                handlers[msg.id].reject(e);
             }
 
             callbacks = listeners[info.apiManager.getResultEventNameByMethodContext(info, 'response')];

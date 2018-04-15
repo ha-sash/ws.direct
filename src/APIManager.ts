@@ -1,4 +1,4 @@
-import * as SocketIO from "socket.io";
+// import * as SocketIO from "socket.io";
 import * as APIError from "./APIErrors";
 import { WSConfig } from "./WSConfig";
 import { WSResponse } from "./WSResponse";
@@ -56,7 +56,7 @@ export class APIManager {
         return this.config.namespace;
     }
 
-    constructor(public io: SocketIO.Server, config: any = {}) {
+    constructor(public io: any, config: any = {}) {
         this.config = new WSConfig(config);
         this.initListeners();
     }
@@ -76,7 +76,7 @@ export class APIManager {
         }
     }
 
-    public sendResponse(response: WSResponse, incomingMessage: any, socket: SocketIO.Socket, eventName: string): void {
+    public sendResponse(response: WSResponse, incomingMessage: any, socket: any, eventName: string): void {
         const result = {
             event:   eventName || this.config.responseEventName,
             id:      incomingMessage.id,
@@ -88,7 +88,7 @@ export class APIManager {
         socket.json.send({...response.getExtraParams(), ...result});
     }
 
-    public sendError(err: any, incomingMessage: any, socket: SocketIO.Socket) {
+    public sendError(err: any, incomingMessage: any, socket: any) {
         let msg: any = {};
         if (err instanceof Object) {
             msg = err;
@@ -261,8 +261,8 @@ export class APIManager {
     }
 
     private initListeners(): void {
-        this.io.sockets.on("connection", (socket) => {
-            socket.on("message", (incomingMessage) => {
+        this.io.sockets.on("connection", (socket: any) => {
+            socket.on("message", (incomingMessage: any) => {
                 this.onMessage(incomingMessage, socket);
             });
         });

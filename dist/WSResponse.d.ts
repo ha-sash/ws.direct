@@ -1,7 +1,7 @@
 export declare class WSResponse {
     api: any;
     incomingMessage: any;
-    socket: SocketIO.Socket;
+    socket: any;
     data: any;
     success: boolean;
     message: string;
@@ -9,7 +9,7 @@ export declare class WSResponse {
         [k: string]: any;
     };
     isSent: boolean;
-    constructor(api: any, incomingMessage: any, socket: SocketIO.Socket);
+    constructor(api: any, incomingMessage: any, socket: any);
     isResult(): true;
     setData(data: any): this;
     getData(): any;
@@ -23,6 +23,6 @@ export declare class WSResponse {
     };
     send(): void;
     setCookie(): void;
-    getSocket(): SocketIO.Socket;
+    getSocket(): any;
     getSession(): any;
 }

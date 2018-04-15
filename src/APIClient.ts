@@ -3,7 +3,9 @@ import { WSDirectClient } from "../public";
 export class APIClient {
 
     public timeout = Infinity;
-    private client: WSDirectClient;
+    private client!: WSDirectClient;
+    private inited = false;
+    private initedTask: Array<() => void> = [];
 
     constructor(private url?: string) {}
 
@@ -20,6 +22,7 @@ export class APIClient {
             try {
                 this.client = new WSDirectClient({url: this.url, autoPublicate: false}, undefined, (c) => {
                     resolve(c);
+                    this.onInited();
                 });
             } catch (err) {
                 reject(err);
@@ -27,12 +30,35 @@ export class APIClient {
         });
     }
 
-    public getAction<T>(actionName: string): T {
+    public getAction<T>(actionName: string): Promise<T> {
+        return new Promise((resolve: any, reject: any) => {
+            const get = () => {
+                const providers: any = this.client.getProviders();
+                resolve(providers[actionName] as T);
+            };
+            if (!this.inited) {
+                this.initedTask.push(get);
+            } else {
+                get();
+            }
+        });
+    }
+
+    public getActionSync<T>(actionName: string): T {
         const providers: any = this.client.getProviders();
         return providers[actionName] as T;
     }
 
     public getApi(): {[action: string]: { [method: string]: (...args: any[]) => Promise<any> }} {
         return this.client.getProviders();
+    }
+
+    private onInited() {
+        this.inited = true;
+        for (const task of this.initedTask) {
+            if (typeof task === "function") {
+                task();
+            }
+        }
     }
 }

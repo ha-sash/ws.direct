@@ -1,3 +1,4 @@
+import * as SocketIO from "socket.io";
 import { WSConfig } from "./WSConfig";
 export declare class APIServer {
     private port;
@@ -7,5 +8,6 @@ export declare class APIServer {
     private actions;
     constructor(config: WSConfig | string, port?: number);
     run(): void;
+    getSocket(): SocketIO.Server;
     add(actionName: string, action: object): void;
 }

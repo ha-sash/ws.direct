@@ -123,7 +123,7 @@ describe('Test client', () => {
             assert.ok(false);
         }).catch(e => {
             assert.ok(!e.success);
-            assert.ok(e.msg == 'Some error');
+            assert.ok(e.message == 'Some error');
             done();
         });
     });

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+// import * as SocketIO from "socket.io";
 const APIError = require("./APIErrors");
 const WSConfig_1 = require("./WSConfig");
 const WSResponse_1 = require("./WSResponse");

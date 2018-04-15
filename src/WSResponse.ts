@@ -1,5 +1,3 @@
-import * as SocketIO from "socket.io";
-
 export class WSResponse {
 
     public data: any;
@@ -8,7 +6,7 @@ export class WSResponse {
     public extra: {[k: string]: any} = {};
     public isSent = false;
 
-    constructor(public api: any, public incomingMessage: any, public socket: SocketIO.Socket) {}
+    constructor(public api: any, public incomingMessage: any, public socket: any) {}
 
     public isResult(): true {
         return true;
@@ -65,7 +63,7 @@ export class WSResponse {
         this.api.sendResponse(this, msg, this.getSocket(), this.api.config.setCookieEventName);
     }
 
-    public getSocket(): SocketIO.Socket {
+    public getSocket(): any {
         return this.socket;
     }
 

@@ -5,6 +5,8 @@ class APIClient {
     constructor(url) {
         this.url = url;
         this.timeout = Infinity;
+        this.inited = false;
+        this.initedTask = [];
     }
     connect(url) {
         if (!this.url && !url) {
@@ -17,6 +19,7 @@ class APIClient {
             try {
                 this.client = new public_1.WSDirectClient({ url: this.url, autoPublicate: false }, undefined, (c) => {
                     resolve(c);
+                    this.onInited();
                 });
             }
             catch (err) {
@@ -25,11 +28,33 @@ class APIClient {
         });
     }
     getAction(actionName) {
+        return new Promise((resolve, reject) => {
+            const get = () => {
+                const providers = this.client.getProviders();
+                resolve(providers[actionName]);
+            };
+            if (!this.inited) {
+                this.initedTask.push(get);
+            }
+            else {
+                get();
+            }
+        });
+    }
+    getActionSync(actionName) {
         const providers = this.client.getProviders();
         return providers[actionName];
     }
     getApi() {
         return this.client.getProviders();
+    }
+    onInited() {
+        this.inited = true;
+        for (const task of this.initedTask) {
+            if (typeof task === "function") {
+                task();
+            }
+        }
     }
 }
 exports.APIClient = APIClient;
