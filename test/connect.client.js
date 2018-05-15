@@ -1,10 +1,10 @@
 const assert = require('assert'),
     APIManager = require('../').APIManager,
     socketio = require('socket.io'),
+    socketioClient = require('socket.io-client'),
     WSDirectClient = require('../public/ws.direct.client'),
     port = 8811;
 
-global.io = require('socket.io-client');
 let xxx = class {
 
     notPublicMethod() {}
@@ -57,7 +57,7 @@ describe('Test simple connection client', () => {
     });
 
     it('Simple connect client', (done) => {
-        var WSDClient = new WSDirectClient(`http://localhost:${port}`);
+        var WSDClient = new WSDirectClient(`http://localhost:${port}`, socketioClient);
         WSDClient.onInit = function() {
             if (wsdirectsimple !== undefined) {
                 done();

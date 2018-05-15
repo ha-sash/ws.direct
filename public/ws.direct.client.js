@@ -40,10 +40,10 @@ var WSDirectClient = function(config, socketio, onConnectCb) {
             config = location.protocol + '//' + location.host;
         }
         this.global = window;
-        this.io = io;
+        this.io = socket || io;
     } catch (e) {
         this.global = global;
-        this.io = require('socket.io-client');
+        this.io = socket || require('socket.io-client');
     }
 
     if (!(socket instanceof this.io.Socket) && config instanceof Object && config.url) {
