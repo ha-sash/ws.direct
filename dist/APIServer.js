@@ -9,8 +9,8 @@ class APIServer {
         this.actions = {};
         this.config = typeof config === "string" ? new WSConfig_1.WSConfig({ url: config }) : config;
     }
-    run() {
-        this.socket = SocketIO.listen(this.port);
+    run(server) {
+        this.socket = server || SocketIO.listen(this.port);
         this.manager = new APIManager_1.APIManager(this.socket, this.config);
         this.manager.add(this.actions);
     }
