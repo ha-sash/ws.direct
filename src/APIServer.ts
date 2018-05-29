@@ -1,5 +1,4 @@
 import * as SocketIO from "socket.io";
-import { Server } from "socket.io";
 import { APIManager } from "./APIManager";
 import { WSConfig } from "./WSConfig";
 
@@ -14,7 +13,7 @@ export class APIServer {
         this.config = typeof config === "string" ? new WSConfig({url: config}) : config ;
     }
 
-    public run(server?: Server) {
+    public run(server?: any) {
         this.socket = server || SocketIO.listen(this.port);
         this.manager = new APIManager(this.socket, this.config);
         this.manager.add(this.actions);
