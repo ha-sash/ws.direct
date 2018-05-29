@@ -5,7 +5,7 @@ import { WSConfig } from "./WSConfig";
 export class APIServer {
 
     private manager!: APIManager;
-    private socket!: SocketIO.Server;
+    private socket!: any;
     private config: WSConfig;
     private actions: {[key: string]: object} = {};
 
@@ -19,7 +19,7 @@ export class APIServer {
         this.manager.add(this.actions);
     }
 
-    public getSocket(): SocketIO.Server {
+    public getSocket(): any {
         return this.socket;
     }
 
