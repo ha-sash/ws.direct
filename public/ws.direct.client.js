@@ -46,14 +46,12 @@ var WSDirectClient = function(config, socketio, onConnectCb) {
         this.io = socket || require('socket.io-client');
     }
 
-    if (!(socket instanceof this.io.Socket) && config instanceof Object && config.url) {
-        socket = this.io.connect(config.url);
-    } else if (!(socket instanceof this.io.Socket) && typeof config === 'string') {
-        socket = this.io.connect(config);
+    if (typeof config === 'string') {
+        config = {url: config};
     }
 
-    if (!(socket instanceof this.io.Socket)) {
-        throw new Error('Not the correct type of the adapter');
+    if ((!socket || !socket.connected) && config) {
+        socket = this.io.connect(config.url);
     }
 
     socket.on('message', function(msg) {
