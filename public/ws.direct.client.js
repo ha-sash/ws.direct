@@ -214,9 +214,6 @@ var WSDirectClient = function(config, socketio, onConnectCb) {
                 throw new Error('Necessary amount of arguments ' + argsLength);
             } else {
                 var socket = me.getSocket();
-                if (!(socket instanceof me.io.Socket)) {
-                    throw new Error('Not the correct type of the adapter');
-                }
 
                 var id = me.guid();
                 var remoteEvent = {
