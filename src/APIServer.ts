@@ -7,10 +7,10 @@ export class APIServer {
     private manager!: APIManager;
     private socket!: any;
     private config: WSConfig;
-    private actions: {[key: string]: object} = {};
+    private actions: { [key: string]: object } = {};
 
     constructor(config: WSConfig | string, private port = 3500) {
-        this.config = typeof config === "string" ? new WSConfig({url: config}) : config ;
+        this.config = typeof config === "string" ? new WSConfig({url: config}) : config;
     }
 
     public run(server?: any) {
@@ -23,7 +23,7 @@ export class APIServer {
         return this.socket;
     }
 
-    public add(actionName: string,  action: object): void {
+    public add(actionName: string, action: object): void {
         this.actions[actionName] = action;
     }
 }

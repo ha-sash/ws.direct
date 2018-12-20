@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-// import * as SocketIO from "socket.io";
 const APIError = require("./APIErrors");
 const WSConfig_1 = require("./WSConfig");
 const WSResponse_1 = require("./WSResponse");
@@ -132,7 +131,8 @@ class APIManager {
         if (!action) {
             return false;
         }
-        if (!action.apiMethods().hasOwnProperty(methodName)) {
+        if (!action.apiMethods()
+            .hasOwnProperty(methodName)) {
             return false;
         }
         return typeof action[methodName] === "function";
@@ -146,19 +146,28 @@ class APIManager {
                     const callResult = api[incomingMessage.method].apply(api, incomingMessage.args.concat(result));
                     if (callResult instanceof Promise) {
                         callResult.then((data) => {
-                            result.setData(data).send();
-                        }).catch((e) => {
-                            result.setSuccess(false).addParam("stack", e.stack || "").setMessage(e.message).send();
+                            result.setData(data)
+                                .send();
+                        })
+                            .catch((e) => {
+                            result.setSuccess(false)
+                                .addParam("stack", e.stack || "")
+                                .setMessage(e.message)
+                                .send();
                         });
                     }
                     else {
                         if (!result.isSent) {
-                            result.setData(callResult).send();
+                            result.setData(callResult)
+                                .send();
                         }
                     }
                 }
                 catch (e) {
-                    result.setSuccess(false).addParam("stack", e.stack || "").setMessage(e.message).send();
+                    result.setSuccess(false)
+                        .addParam("stack", e.stack || "")
+                        .setMessage(e.message)
+                        .send();
                 }
             }
         }
@@ -207,10 +216,13 @@ class APIManager {
         return methods;
     }
     getArtuments(fn) {
-        const strFn = fn.toString().replace(/^async /i, "");
+        const strFn = fn.toString()
+            .replace(/^async /i, "");
         const fnHeader = strFn.match(/^[a-z0-9_]+(?:\s|)\((.*?)\)/gi);
         if (fnHeader && fnHeader[0]) {
-            return fnHeader[0].replace(/^[a-z0-9_]+(?:\s|)\(/gi, "").replace(/\)/g, "").split(", ");
+            return fnHeader[0].replace(/^[a-z0-9_]+(?:\s|)\(/gi, "")
+                .replace(/\)/g, "")
+                .split(", ");
         }
         return [];
     }

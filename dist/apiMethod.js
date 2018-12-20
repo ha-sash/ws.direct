@@ -1,14 +1,26 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+/* tslint:disable no-conditional-assignment */
 function apiMethod(target, propertyKey, descriptor) {
-    if (!target.hasOwnProperty("___apiMethodList")) {
-        target.___apiMethodList = {};
-    }
     if (!target.hasOwnProperty("apiMethods")) {
-        target.apiMethods = () => {
-            return target.___apiMethodList;
+        target.apiMethods = function () {
+            let props = [];
+            let obj = this;
+            if (this.apiMethodsCache) {
+                return this.apiMethodsCache;
+            }
+            this.apiMethodsCache = {};
+            do {
+                props = props.concat(Object.getOwnPropertyNames(obj));
+            } while (obj = Object.getPrototypeOf(obj));
+            for (const m of props) {
+                if (this[m] && typeof this[m] === "function" && this[m].isApiMethod) {
+                    this.apiMethodsCache[m] = true;
+                }
+            }
+            return this.apiMethodsCache;
         };
     }
-    target.___apiMethodList[propertyKey] = true;
+    target[propertyKey].isApiMethod = true;
 }
 exports.apiMethod = apiMethod;

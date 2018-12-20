@@ -1,4 +1,5 @@
-// import * as SocketIO from "socket.io";
+/* tslint:disable no-parameter-reassignment */
+import { Socket } from "socket.io";
 import * as APIError from "./APIErrors";
 import { WSConfig } from "./WSConfig";
 import { WSResponse } from "./WSResponse";
@@ -127,7 +128,7 @@ export class APIManager {
         return script.join("");
     }
 
-    private validateMessage(incomingMessage: any, socket: SocketIO.Socket): boolean {
+    private validateMessage(incomingMessage: any, socket: Socket): boolean {
         let result = false;
         let err: string | false = false;
 
@@ -163,7 +164,8 @@ export class APIManager {
             return false;
         }
 
-        if (!action.apiMethods().hasOwnProperty(methodName)) {
+        if (!action.apiMethods()
+            .hasOwnProperty(methodName)) {
             return false;
         }
 
@@ -181,18 +183,27 @@ export class APIManager {
 
                     if (callResult instanceof Promise) {
                         callResult.then((data) => {
-                            result.setData(data).send();
-                        }).catch((e) => {
-                            result.setSuccess(false).addParam("stack", e.stack || "").setMessage(e.message).send();
+                            result.setData(data)
+                                .send();
+                        })
+                        .catch((e) => {
+                            result.setSuccess(false)
+                                .addParam("stack", e.stack || "")
+                                .setMessage(e.message)
+                                .send();
                         });
                     } else {
                         if (!result.isSent) {
-                            result.setData(callResult).send();
+                            result.setData(callResult)
+                                .send();
                         }
                     }
 
                 } catch (e) {
-                    result.setSuccess(false).addParam("stack", e.stack || "").setMessage(e.message).send();
+                    result.setSuccess(false)
+                        .addParam("stack", e.stack || "")
+                        .setMessage(e.message)
+                        .send();
                 }
             }
         } else if (incomingMessage.event == this.config.initEventName) {
@@ -250,11 +261,14 @@ export class APIManager {
     }
 
     private getArtuments(fn: any): string[] {
-        const strFn = fn.toString().replace(/^async /i, "");
+        const strFn = fn.toString()
+            .replace(/^async /i, "");
         const fnHeader = strFn.match(/^[a-z0-9_]+(?:\s|)\((.*?)\)/gi);
 
         if (fnHeader && fnHeader[0]) {
-            return fnHeader[0].replace(/^[a-z0-9_]+(?:\s|)\(/gi, "").replace(/\)/g, "").split(", ");
+            return fnHeader[0].replace(/^[a-z0-9_]+(?:\s|)\(/gi, "")
+                .replace(/\)/g, "")
+                .split(", ");
         }
 
         return [];
