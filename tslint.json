@@ -45,12 +45,17 @@
     "typedef": false,
     "no-this-assignment": false,
     "object-literal-sort-keys": false,
+    "file-name-casing": false,
+    "quotemark": [true,
+      "single",
+      "avoid-escape",
+      "avoid-template"
+    ],
 
     "ban": [true,
       ["describe", "only"],
       ["it", "only"]
     ],
-
     "interface-name": false,
     /*
     "file-header": [true,

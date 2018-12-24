@@ -1,7 +1,13 @@
-import { WSConfig } from "./WSConfig";
-import { WSResponse } from "./WSResponse";
+import { Server } from 'socket.io';
+import { WSConfig } from './WSConfig';
+import { WSResponse } from './WSResponse';
+export interface Method {
+    method: string;
+    arguments: string[];
+    httpMethod?: string;
+}
 export declare class APIManager {
-    io: any;
+    io?: Server;
     config: WSConfig;
     actions: {
         [action: string]: any;
@@ -19,17 +25,22 @@ export declare class APIManager {
     readonly callEventName: string;
     readonly initEventName: string;
     readonly namespace: string;
-    constructor(io: any, config?: any);
+    constructor(config?: any);
+    setSocket(socket: Server): void;
+    initListeners(): void;
     add(actionName: any, object?: any): void;
+    getActions(): {
+        [action: string]: any;
+    };
     sendResponse(response: WSResponse, incomingMessage: any, socket: any, eventName: string): void;
     sendError(err: any, incomingMessage: any, socket: any): void;
     getScript(): string;
-    private validateMessage(incomingMessage, socket);
-    private isExistsActionMethod(actionName, methodName);
-    private onMessage(incomingMessage, socket);
-    private createResponse(incomingMessage, socket);
-    private getApiConfig();
-    private getMethods(action);
-    private getArtuments(fn);
-    private initListeners();
+    getConfig(): WSConfig;
+    getMethods(action: any): Method[];
+    private validateMessage;
+    private isExistsActionMethod;
+    private onMessage;
+    private createResponse;
+    private getApiConfig;
+    private getArtuments;
 }

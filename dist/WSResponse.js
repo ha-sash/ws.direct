@@ -6,7 +6,7 @@ class WSResponse {
         this.incomingMessage = incomingMessage;
         this.socket = socket;
         this.success = true;
-        this.message = "Ok";
+        this.message = 'Ok';
         this.extra = {};
         this.isSent = false;
     }
@@ -49,7 +49,7 @@ class WSResponse {
     }
     setCookie() {
         let msg = this.incomingMessage;
-        if (typeof msg !== "string") {
+        if (typeof msg !== 'string') {
             msg = JSON.stringify(msg);
         }
         this.api.sendResponse(this, msg, this.getSocket(), this.api.config.setCookieEventName);

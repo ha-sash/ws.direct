@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 /* tslint:disable no-conditional-assignment */
 function apiMethod(target, propertyKey, descriptor) {
-    if (!target.hasOwnProperty("apiMethods")) {
+    if (!target.hasOwnProperty('apiMethods')) {
         target.apiMethods = function () {
             let props = [];
             let obj = this;
@@ -14,7 +14,7 @@ function apiMethod(target, propertyKey, descriptor) {
                 props = props.concat(Object.getOwnPropertyNames(obj));
             } while (obj = Object.getPrototypeOf(obj));
             for (const m of props) {
-                if (this[m] && typeof this[m] === "function" && this[m].isApiMethod) {
+                if (this[m] && typeof this[m] === 'function' && this[m].isApiMethod) {
                     this.apiMethodsCache[m] = true;
                 }
             }

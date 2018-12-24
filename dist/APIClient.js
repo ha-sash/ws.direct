@@ -10,7 +10,7 @@ class APIClient {
     }
     connect(url) {
         if (!this.url && !url) {
-            throw new Error("The connection URL is missing.");
+            throw new Error('The connection URL is missing.');
         }
         if (url) {
             this.url = url;
@@ -51,7 +51,7 @@ class APIClient {
     onInited() {
         this.inited = true;
         for (const task of this.initedTask) {
-            if (typeof task === "function") {
+            if (typeof task === 'function') {
                 task();
             }
         }

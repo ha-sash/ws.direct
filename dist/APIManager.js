@@ -4,13 +4,11 @@ const APIError = require("./APIErrors");
 const WSConfig_1 = require("./WSConfig");
 const WSResponse_1 = require("./WSResponse");
 class APIManager {
-    constructor(io, config = {}) {
-        this.io = io;
+    constructor(config = {}) {
         this.actions = {};
         this.resultObject = WSResponse_1.WSResponse;
         this.errors = APIError;
         this.config = new WSConfig_1.WSConfig(config);
-        this.initListeners();
     }
     get url() {
         return this.config.url;
@@ -42,6 +40,18 @@ class APIManager {
     get namespace() {
         return this.config.namespace;
     }
+    setSocket(socket) {
+        this.io = socket;
+    }
+    initListeners() {
+        if (this.io) {
+            this.io.sockets.on('connection', (socket) => {
+                socket.on('message', (incomingMessage) => {
+                    this.onMessage(incomingMessage, socket);
+                });
+            });
+        }
+    }
     add(actionName, object) {
         if (actionName instanceof Object && object === undefined) {
             for (const i in actionName) {
@@ -51,11 +61,14 @@ class APIManager {
             }
         }
         else if (this.actions[actionName] === undefined && object !== undefined && object instanceof Object) {
-            if (object.apiMethods === undefined || typeof object.apiMethods !== "function") {
+            if (object.apiMethods === undefined || typeof object.apiMethods !== 'function') {
                 throw new Error(`API ('${actionName}) object has to have a method "apiMethods"`);
             }
             this.actions[actionName] = object;
         }
+    }
+    getActions() {
+        return this.actions;
     }
     sendResponse(response, incomingMessage, socket, eventName) {
         const result = {
@@ -72,7 +85,7 @@ class APIManager {
         if (err instanceof Object) {
             msg = err;
         }
-        else if (typeof err === "string" && this.errors[err]) {
+        else if (typeof err === 'string' && this.errors[err]) {
             const tmpl = this.errors[err];
             let text = tmpl.msg;
             for (const i in msg) {
@@ -91,32 +104,53 @@ class APIManager {
     }
     getScript() {
         const script = [];
-        script.push("(function() {", "var WSDClient = new WSDirectClient(", JSON.stringify(this.getApiConfig()), this.browserSocketVariableName === null ? "" : `, ${this.browserSocketVariableName}`, ");", "})();");
-        return script.join("");
+        script.push('(function() {', 'var WSDClient = new WSDirectClient(', JSON.stringify(this.getApiConfig()), this.browserSocketVariableName === null ? '' : `, ${this.browserSocketVariableName}`, ');', '})();');
+        return script.join('');
+    }
+    getConfig() {
+        return this.config;
+    }
+    getMethods(action) {
+        const methods = [];
+        let publicMethods;
+        if (typeof action === 'string') {
+            action = this.actions[action];
+        }
+        publicMethods = action.apiMethods();
+        for (const methodName in publicMethods) {
+            if (publicMethods[methodName] && action[methodName] instanceof Function) {
+                const args = this.getArtuments(action[methodName]);
+                methods.push({
+                    method: methodName,
+                    arguments: args.slice(0, args.length - 1),
+                });
+            }
+        }
+        return methods;
     }
     validateMessage(incomingMessage, socket) {
         let result = false;
         let err = false;
         if (incomingMessage.id === undefined) {
-            err = "apiCallMsgIdNotFound";
+            err = 'apiCallMsgIdNotFound';
         }
         else if (incomingMessage.action === undefined) {
-            err = "apiCallMsgActionNotFound";
+            err = 'apiCallMsgActionNotFound';
         }
         else if (this.actions[incomingMessage.action] === undefined) {
-            err = "apiCallActionObjectNotFound";
+            err = 'apiCallActionObjectNotFound';
         }
         else if (incomingMessage.method === undefined) {
-            err = "apiCallMsgMethodNotFound";
+            err = 'apiCallMsgMethodNotFound';
         }
         else if (incomingMessage.args === undefined) {
-            err = "apiCallMsgArgsNotFound";
+            err = 'apiCallMsgArgsNotFound';
         }
         else if (!Array.isArray(incomingMessage.args)) {
-            err = "apiCallMsgArgsIsNotArray";
+            err = 'apiCallMsgArgsIsNotArray';
         }
         else if (!this.isExistsActionMethod(incomingMessage.action, incomingMessage.method)) {
-            err = "apiCallMethodNotFoundInObject";
+            err = 'apiCallMethodNotFoundInObject';
         }
         else {
             result = true;
@@ -135,7 +169,7 @@ class APIManager {
             .hasOwnProperty(methodName)) {
             return false;
         }
-        return typeof action[methodName] === "function";
+        return typeof action[methodName] === 'function';
     }
     onMessage(incomingMessage, socket) {
         if (incomingMessage.event == this.config.callEventName) {
@@ -151,7 +185,7 @@ class APIManager {
                         })
                             .catch((e) => {
                             result.setSuccess(false)
-                                .addParam("stack", e.stack || "")
+                                .addParam('stack', e.stack || '')
                                 .setMessage(e.message)
                                 .send();
                         });
@@ -165,7 +199,7 @@ class APIManager {
                 }
                 catch (e) {
                     result.setSuccess(false)
-                        .addParam("stack", e.stack || "")
+                        .addParam('stack', e.stack || '')
                         .setMessage(e.message)
                         .send();
                 }
@@ -197,41 +231,19 @@ class APIManager {
         }
         return result;
     }
-    getMethods(action) {
-        const methods = [];
-        let publicMethods;
-        if (typeof action === "string") {
-            action = this.actions[action];
-        }
-        publicMethods = action.apiMethods();
-        for (const methodName in publicMethods) {
-            if (publicMethods[methodName] && action[methodName] instanceof Function) {
-                const args = this.getArtuments(action[methodName]);
-                methods.push({
-                    method: methodName,
-                    arguments: args.slice(0, args.length - 1),
-                });
-            }
-        }
-        return methods;
-    }
     getArtuments(fn) {
         const strFn = fn.toString()
-            .replace(/^async /i, "");
+            .replace(/^async /i, '');
         const fnHeader = strFn.match(/^[a-z0-9_]+(?:\s|)\((.*?)\)/gi);
         if (fnHeader && fnHeader[0]) {
-            return fnHeader[0].replace(/^[a-z0-9_]+(?:\s|)\(/gi, "")
-                .replace(/\)/g, "")
-                .split(", ");
+            if (fnHeader[0].indexOf('=') !== -1) {
+                throw new Error('Default values are not supported');
+            }
+            return fnHeader[0].replace(/^[a-z0-9_]+(?:\s|)\(/gi, '')
+                .replace(/\)/g, '')
+                .split(', ');
         }
         return [];
-    }
-    initListeners() {
-        this.io.sockets.on("connection", (socket) => {
-            socket.on("message", (incomingMessage) => {
-                this.onMessage(incomingMessage, socket);
-            });
-        });
     }
 }
 exports.APIManager = APIManager;

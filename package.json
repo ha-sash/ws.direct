@@ -1,6 +1,6 @@
 {
   "name": "ws.direct",
-  "version": "1.1.11",
+  "version": "1.1.12",
   "description": "RPC via WebSocket, access to the objects on server. And implementation of the Ext.direct via WebSocket.",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
@@ -21,13 +21,17 @@
   "author": "Aleksander Moskvitin <moskvandr@gmail.com>",
   "license": "ISC",
   "devDependencies": {
-    "@types/socket.io": "^1.4.33",
+    "@types/restify": "^7.2.6",
+    "@types/socket.io": "^2.1.2",
     "mocha": "^5.2.0",
-    "nyc": "^13.0.1",
-    "typescript": "^2.8.1"
+    "nyc": "^13.1.0",
+    "restify-clients": "^2.6.4",
+    "tslint": "^5.12.0",
+    "typescript": "^3.2.2"
   },
   "dependencies": {
-    "socket.io": "^2.1.1"
+    "restify": "^7.3.0",
+    "socket.io": "^2.2.0"
   },
   "nyc": {
     "include": [

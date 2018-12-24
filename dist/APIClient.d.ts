@@ -1,6 +1,6 @@
-import { WSDirectClient } from "../public";
+import { WSDirectClient } from '../public';
 export declare class APIClient {
-    private url;
+    private url?;
     timeout: number;
     private client;
     private inited;
@@ -14,5 +14,5 @@ export declare class APIClient {
             [method: string]: (...args: any[]) => Promise<any>;
         };
     };
-    private onInited();
+    private onInited;
 }
