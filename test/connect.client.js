@@ -13,6 +13,7 @@ let xxx = class {
 
   publicMethod(x, y, result) {
     if (result.isResult()) {
+      this.notPublicMethod();
       result.setData(x + y);
       result.setMessage('SUPER');
       result.send();

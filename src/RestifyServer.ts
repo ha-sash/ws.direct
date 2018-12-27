@@ -86,8 +86,9 @@ export class RestifyServer extends EventEmitter {
     try {
       const args = this.getArguments(methodParams, req);
       this.emit('beforeCall', response, args);
-      const callResult = await this.manager.getActions()[actionName][methodName]
-        .apply(api, args.concat(response));
+      const action = this.manager.getActions()[actionName];
+      const callResult = await action[methodName]
+        .apply(action, args.concat(response));
 
       response.setData(callResult);
       this.emit('beforeSendResult', response, args);
