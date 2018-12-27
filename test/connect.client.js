@@ -36,12 +36,19 @@ let xxx = class {
     throw new Error('Some error');
   }
 
+  restCheckOnBeforeCall(result) {
+    if (result.isResult()) {
+      return result.asyncOk;
+    }
+  }
+
   apiMethods() {
     return {
       publicMethod: true,
       publicMethodException: true,
       publicMethodAutoSendResult: true,
-      publicAsyncMethodAutoSendResult: true
+      publicAsyncMethodAutoSendResult: true,
+      restCheckOnBeforeCall: true,
     };
   }
 };
@@ -90,6 +97,14 @@ describe('Test client', () => {
     }, port);
     api.add('xxxAction', xxxObject);
     await api.run();
+    api.getRestifyServer().on('beforeCall', (response) => {
+      return new Promise(resolve => {
+        setTimeout(() => {
+          response.asyncOk = true;
+          resolve();
+        }, 200);
+      });
+    });
   });
 
   after(() => {
@@ -126,6 +141,25 @@ describe('Test client', () => {
       assert.strictEqual(res.statusCode, 500);
       assert.ok(!obj.success);
       assert.ok(obj.msg == 'Some error');
+      done();
+    });
+  });
+
+  it('REST: restCheckOnBeforeCall', (done) => {
+    const client = clients.createJsonClient({
+      url: `http://localhost:${port}`
+    });
+
+    const options = {
+      path: '/wsdirect/xxxAction/restCheckOnBeforeCall',
+    };
+    const data = {};
+
+
+    client.post(options, data, function (err, req, res, obj) {
+      assert.strictEqual(res.statusCode, 200);
+      assert.ok(obj.result);
+      assert.ok(obj.success);
       done();
     });
   });
