@@ -1,5 +1,6 @@
 import { EventEmitter } from 'eventemitter3';
 import { createServer, plugins, Request, Response, Server } from 'restify';
+
 import { APIManager, Method } from './APIManager';
 import { RestifyResponse } from './RestifyResponse';
 
@@ -134,9 +135,8 @@ export class RestifyServer extends EventEmitter {
     return methodParams.arguments.map((paramName) => {
       if (resultParams.hasOwnProperty(paramName)) {
         return resultParams[paramName];
-      } else {
-        throw new Error(`Parameter ${paramName} not found`);
       }
+      throw new Error(`Parameter ${paramName} not found`);
     });
   }
 

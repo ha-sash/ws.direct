@@ -1,5 +1,6 @@
 /* tslint:disable no-parameter-reassignment */
 import { Server, Socket } from 'socket.io';
+
 import * as APIError from './APIErrors';
 import { WSConfig } from './WSConfig';
 import { WSResponse } from './WSResponse';
@@ -79,11 +80,9 @@ export class APIManager {
 
   public add(actionName: any, object?: any): void {
     if (actionName instanceof Object && object === undefined) {
-      for (const i in actionName) {
-        if (actionName.hasOwnProperty(i)) {
-          this.add(i, actionName[i]);
-        }
-      }
+      Object.keys(actionName).forEach((i: string) => {
+        this.add(i, actionName[i]);
+      });
     } else if (this.actions[actionName] === undefined && object !== undefined && object instanceof Object) {
       if (object.apiMethods === undefined || typeof object.apiMethods !== 'function') {
         throw new Error(`API ('${actionName}) object has to have a method "apiMethods"`);
@@ -116,11 +115,9 @@ export class APIManager {
       const tmpl = this.errors[err];
       let text = tmpl.msg;
 
-      for (const i in msg) {
-        if (msg.hasOwnProperty(i)) {
-          text = text.replace(`{${i}`, msg[i]);
-        }
-      }
+      Object.keys(msg).forEach((i: string) => {
+        text = text.replace(`{${i}`, msg[i]);
+      });
 
       msg = {
         type: tmpl.type,
@@ -161,7 +158,7 @@ export class APIManager {
 
     publicMethods = action.apiMethods();
 
-    for (const methodName in publicMethods) {
+    Object.keys(publicMethods).forEach((methodName) => {
       if (publicMethods[methodName] && action[methodName] instanceof Function) {
         const args = this.getArtuments(action[methodName]);
         methods.push({
@@ -169,7 +166,7 @@ export class APIManager {
           arguments: args.slice(0, args.length - 1),
         });
       }
-    }
+    });
 
     return methods;
   }
@@ -274,11 +271,9 @@ export class APIManager {
       actions: {},
     };
 
-    for (const i in this.actions) {
-      if (this.actions.hasOwnProperty(i)) {
-        result.actions[i] = this.getMethods(this.actions[i]);
-      }
-    }
+    Object.keys(this.actions).forEach((i: string) => {
+      result.actions[i] = this.getMethods(this.actions[i]);
+    });
 
     return result;
   }
@@ -290,7 +285,7 @@ export class APIManager {
 
     if (fnHeader && fnHeader[0]) {
       if (fnHeader[0].indexOf('=') !== -1) {
-        throw new Error('Default values are not supported');
+        throw new Error(`Default values are not supported (fn: ${strFn})`);
       }
       return fnHeader[0].replace(/^[a-z0-9_]+(?:\s|)\(/gi, '')
         .replace(/\)/g, '')

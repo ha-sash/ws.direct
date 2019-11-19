@@ -54,11 +54,9 @@ class APIManager {
     }
     add(actionName, object) {
         if (actionName instanceof Object && object === undefined) {
-            for (const i in actionName) {
-                if (actionName.hasOwnProperty(i)) {
-                    this.add(i, actionName[i]);
-                }
-            }
+            Object.keys(actionName).forEach((i) => {
+                this.add(i, actionName[i]);
+            });
         }
         else if (this.actions[actionName] === undefined && object !== undefined && object instanceof Object) {
             if (object.apiMethods === undefined || typeof object.apiMethods !== 'function') {
@@ -78,7 +76,7 @@ class APIManager {
             success: response.isSuccess(),
             msg: response.getMessage(),
         };
-        socket.json.send(Object.assign({}, response.getExtraParams(), result));
+        socket.json.send(Object.assign(Object.assign({}, response.getExtraParams()), result));
     }
     sendError(err, incomingMessage, socket) {
         let msg = {};
@@ -88,11 +86,9 @@ class APIManager {
         else if (typeof err === 'string' && this.errors[err]) {
             const tmpl = this.errors[err];
             let text = tmpl.msg;
-            for (const i in msg) {
-                if (msg.hasOwnProperty(i)) {
-                    text = text.replace(`{${i}`, msg[i]);
-                }
-            }
+            Object.keys(msg).forEach((i) => {
+                text = text.replace(`{${i}`, msg[i]);
+            });
             msg = {
                 type: tmpl.type,
                 msg: tmpl.msg,
@@ -117,7 +113,7 @@ class APIManager {
             action = this.actions[action];
         }
         publicMethods = action.apiMethods();
-        for (const methodName in publicMethods) {
+        Object.keys(publicMethods).forEach((methodName) => {
             if (publicMethods[methodName] && action[methodName] instanceof Function) {
                 const args = this.getArtuments(action[methodName]);
                 methods.push({
@@ -125,7 +121,7 @@ class APIManager {
                     arguments: args.slice(0, args.length - 1),
                 });
             }
-        }
+        });
         return methods;
     }
     validateMessage(incomingMessage, socket) {
@@ -224,11 +220,9 @@ class APIManager {
             erroreventname: this.config.errorEventName,
             actions: {},
         };
-        for (const i in this.actions) {
-            if (this.actions.hasOwnProperty(i)) {
-                result.actions[i] = this.getMethods(this.actions[i]);
-            }
-        }
+        Object.keys(this.actions).forEach((i) => {
+            result.actions[i] = this.getMethods(this.actions[i]);
+        });
         return result;
     }
     getArtuments(fn) {
@@ -237,7 +231,7 @@ class APIManager {
         const fnHeader = strFn.match(/^[a-z0-9_]+(?:\s|)\((.*?)\)/gi);
         if (fnHeader && fnHeader[0]) {
             if (fnHeader[0].indexOf('=') !== -1) {
-                throw new Error('Default values are not supported');
+                throw new Error(`Default values are not supported (fn: ${strFn})`);
             }
             return fnHeader[0].replace(/^[a-z0-9_]+(?:\s|)\(/gi, '')
                 .replace(/\)/g, '')

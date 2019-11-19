@@ -120,15 +120,13 @@ class RestifyServer extends eventemitter3_1.EventEmitter {
         let resultParams = {};
         switch (methodParams.httpMethod) {
             default:
-                resultParams = Object.assign({}, queryParams, req.body);
+                resultParams = Object.assign(Object.assign({}, queryParams), req.body);
         }
         return methodParams.arguments.map((paramName) => {
             if (resultParams.hasOwnProperty(paramName)) {
                 return resultParams[paramName];
             }
-            else {
-                throw new Error(`Parameter ${paramName} not found`);
-            }
+            throw new Error(`Parameter ${paramName} not found`);
         });
     }
     createIncomingMessageStub(actionName, methodName, req) {

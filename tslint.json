@@ -6,6 +6,7 @@
   "rules": {
     "cyclomatic-complexity": false,
     "newline-before-return": false,
+    "newline-per-chained-call": false,
     "no-parameter-properties": false,
     "no-unused-variable": false,
 

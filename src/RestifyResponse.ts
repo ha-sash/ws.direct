@@ -1,4 +1,5 @@
 import { Request, Response } from 'restify';
+
 import { WSResponse } from './WSResponse';
 
 export class RestifyResponse extends WSResponse {
