@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-const SocketIO = require("socket.io");
+exports.APIServer = void 0;
+const socket_io_1 = require("socket.io");
 const APIManager_1 = require("./APIManager");
 const WSConfig_1 = require("./WSConfig");
 class APIServer {
@@ -21,23 +22,9 @@ class APIServer {
         this.socket = server;
         this.manager = new APIManager_1.APIManager(this.config);
         this.manager.add(this.actions);
-        const restServer = await this.initRestifyServer();
-        if (restServer) {
-            if (!this.socket) {
-                this.socket = SocketIO.listen(restServer.server);
-            }
-            else {
-                if (!this.socket.httpServer) {
-                    this.socket.attach(restServer.server);
-                }
-                else {
-                    throw new Error('HTTP server has already been added.');
-                }
-            }
-            restServer.listen(this.port);
-        }
         if (!this.socket) {
-            this.socket = SocketIO.listen(this.port);
+            const srv = new socket_io_1.Server();
+            this.socket = srv.listen(this.port);
         }
         this.manager.setSocket(this.socket);
         this.manager.initListeners();
@@ -50,19 +37,6 @@ class APIServer {
     }
     add(actionName, action) {
         this.actions[actionName] = action;
-    }
-    getRestifyServer() {
-        return this.restifyServer;
-    }
-    async initRestifyServer() {
-        const config = this.manager.getConfig();
-        if (config.restifyServerOptions) {
-            const { RestifyServer } = await Promise.resolve().then(() => require('./RestifyServer'));
-            const server = new RestifyServer(this.manager);
-            this.restifyServer = server;
-            return server.getServer();
-        }
-        return false;
     }
 }
 exports.APIServer = APIServer;

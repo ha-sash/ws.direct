@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.WSResponse = void 0;
 class WSResponse {
     constructor(api, incomingMessage, socket) {
         this.api = api;

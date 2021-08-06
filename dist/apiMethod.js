@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.apiMethod = void 0;
 /* tslint:disable no-conditional-assignment */
 function apiMethod(target, propertyKey, descriptor) {
     if (!target.hasOwnProperty('apiMethods')) {

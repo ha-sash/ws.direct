@@ -85,7 +85,7 @@ export class APIManager {
       });
     } else if (this.actions[actionName] === undefined && object !== undefined && object instanceof Object) {
       if (object.apiMethods === undefined || typeof object.apiMethods !== 'function') {
-        throw new Error(`API ('${actionName}) object has to have a method "apiMethods"`);
+        throw new Error(`API ('${actionName}) object must have a method "apiMethods"`);
       }
       this.actions[actionName] = object;
     }
@@ -95,7 +95,7 @@ export class APIManager {
     return this.actions;
   }
 
-  public sendResponse(response: WSResponse, incomingMessage: any, socket: any, eventName: string): void {
+  public sendResponse(response: WSResponse, incomingMessage: any, socket: Socket, eventName: string): void {
     const result = {
       event: eventName || this.config.responseEventName,
       id: incomingMessage.id,
@@ -104,10 +104,10 @@ export class APIManager {
       msg: response.getMessage(),
     };
 
-    socket.json.send({...response.getExtraParams(), ...result});
+    socket.send({...response.getExtraParams(), ...result});
   }
 
-  public sendError(err: any, incomingMessage: any, socket: any) {
+  public sendError(err: any, incomingMessage: any, socket: Socket) {
     let msg: any = {};
     if (err instanceof Object) {
       msg = err;
@@ -127,7 +127,7 @@ export class APIManager {
     }
 
     msg.id = incomingMessage.id;
-    socket.json.send(msg);
+    socket.send(msg);
   }
 
   public getScript() {
@@ -253,7 +253,7 @@ export class APIManager {
       if (!this.apiConfigCache) {
         this.apiConfigCache = this.getApiConfig();
       }
-      socket.json.send({event: this.config.initEventName, config: this.apiConfigCache});
+      socket.send({event: this.config.initEventName, config: this.apiConfigCache});
     }
   }
 

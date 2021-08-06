@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.apiCallMsgArgsIsNotArray = exports.apiCallMsgArgsNotFound = exports.apiCallMethodNotFoundInObject = exports.apiCallMsgMethodNotFound = exports.apiCallActionObjectNotFound = exports.apiCallMsgActionNotFound = exports.apiCallMsgIdNotFound = void 0;
 exports.apiCallMsgIdNotFound = {
     type: 'global_error',
     msg: 'Not found api call id.',

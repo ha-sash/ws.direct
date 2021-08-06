@@ -1,4 +1,4 @@
-import { Server } from 'socket.io';
+import { Server, Socket } from 'socket.io';
 import { WSConfig } from './WSConfig';
 import { WSResponse } from './WSResponse';
 export interface Method {
@@ -32,8 +32,8 @@ export declare class APIManager {
     getActions(): {
         [action: string]: any;
     };
-    sendResponse(response: WSResponse, incomingMessage: any, socket: any, eventName: string): void;
-    sendError(err: any, incomingMessage: any, socket: any): void;
+    sendResponse(response: WSResponse, incomingMessage: any, socket: Socket, eventName: string): void;
+    sendError(err: any, incomingMessage: any, socket: Socket): void;
     getScript(): string;
     getConfig(): WSConfig;
     getMethods(action: any): Method[];

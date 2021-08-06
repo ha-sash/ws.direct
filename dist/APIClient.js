@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.APIClient = void 0;
 const public_1 = require("../public");
 class APIClient {
     constructor(url) {

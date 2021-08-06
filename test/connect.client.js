@@ -4,7 +4,6 @@ const socketio = require('socket.io');
 const socketioClient = require('socket.io-client');
 const WSDirectClient = require('../public/ws.direct.client');
 const port = 8811;
-const clients = require('restify-clients');
 
 let xxx = class {
 
@@ -36,11 +35,6 @@ let xxx = class {
     throw new Error('Some error');
   }
 
-  restCheckOnBeforeCall(result) {
-    if (result.isResult()) {
-      return result.asyncOk;
-    }
-  }
 
   apiMethods() {
     return {
@@ -63,7 +57,6 @@ describe('Test simple connection client', () => {
     api = new APIServer({
       url: `http://localhost:${port}`,
       namespace: 'wsdirectsimple',
-      restifyServerOptions: {},
     }, port);
     api.add('xxxAction', xxxObject);
     await api.run();
@@ -97,14 +90,6 @@ describe('Test client', () => {
     }, port);
     api.add('xxxAction', xxxObject);
     await api.run();
-    api.getRestifyServer().on('beforeCall', (response) => {
-      return new Promise(resolve => {
-        setTimeout(() => {
-          response.asyncOk = true;
-          resolve();
-        }, 200);
-      });
-    });
   });
 
   after(() => {
@@ -126,70 +111,10 @@ describe('Test client', () => {
     assert.ok(wsdirect.xxxAction.notPublicMethod === undefined);
   });
 
-  it('REST: Call public remote method with exception', (done) => {
-    const client = clients.createJsonClient({
-      url: `http://localhost:${port}`
-    });
-
-    const options = {
-      path: '/wsdirect/xxxAction/publicMethodException',
-    };
-    const data = {};
-
-
-    client.post(options, data, function (err, req, res, obj) {
-      assert.strictEqual(res.statusCode, 500);
-      assert.ok(!obj.success);
-      assert.ok(obj.msg == 'Some error');
-      done();
-    });
-  });
-
-  it('REST: restCheckOnBeforeCall', (done) => {
-    const client = clients.createJsonClient({
-      url: `http://localhost:${port}`
-    });
-
-    const options = {
-      path: '/wsdirect/xxxAction/restCheckOnBeforeCall',
-    };
-    const data = {};
-
-
-    client.post(options, data, function (err, req, res, obj) {
-      assert.strictEqual(res.statusCode, 200);
-      assert.ok(obj.result);
-      assert.ok(obj.success);
-      done();
-    });
-  });
-
   it('Call public remote method with exception', (done) => {
     wsdirect.xxxAction.publicMethodException((res, e) => {
       assert.ok(!e.success);
       assert.ok(e.msg == 'Some error');
-      done();
-    });
-  });
-
-  it('REST: Call public remote method', (done) => {
-    const client = clients.createJsonClient({
-      url: `http://localhost:${port}`
-    });
-
-    const options = {
-      path: '/wsdirect/xxxAction/publicMethod',
-    };
-    const data = {
-      x: 5,
-      y: 3,
-    };
-
-
-    client.post(options, data, function (err, req, res, obj) {
-      assert.strictEqual(res.statusCode, 200);
-      assert.ok(obj.success);
-      assert.strictEqual(obj.result, 8);
       done();
     });
   });

@@ -9,6 +9,5 @@ export declare class WSConfig {
     callEventName: string;
     initEventName: string;
     namespace: string;
-    restifyServerOptions: any;
     constructor(cfg?: any);
 }

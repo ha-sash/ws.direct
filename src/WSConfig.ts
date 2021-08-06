@@ -10,7 +10,6 @@ export class WSConfig {
   public callEventName = 'api:call';
   public initEventName = 'api:init';
   public namespace = 'wsdirect';
-  public restifyServerOptions: any = false;
 
   constructor(cfg: any = {}) {
     Object.assign(this, cfg);

@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.APIManager = void 0;
 const APIError = require("./APIErrors");
 const WSConfig_1 = require("./WSConfig");
 const WSResponse_1 = require("./WSResponse");
@@ -60,7 +61,7 @@ class APIManager {
         }
         else if (this.actions[actionName] === undefined && object !== undefined && object instanceof Object) {
             if (object.apiMethods === undefined || typeof object.apiMethods !== 'function') {
-                throw new Error(`API ('${actionName}) object has to have a method "apiMethods"`);
+                throw new Error(`API ('${actionName}) object must have a method "apiMethods"`);
             }
             this.actions[actionName] = object;
         }
@@ -76,7 +77,7 @@ class APIManager {
             success: response.isSuccess(),
             msg: response.getMessage(),
         };
-        socket.json.send(Object.assign(Object.assign({}, response.getExtraParams()), result));
+        socket.send(Object.assign(Object.assign({}, response.getExtraParams()), result));
     }
     sendError(err, incomingMessage, socket) {
         let msg = {};
@@ -96,7 +97,7 @@ class APIManager {
             };
         }
         msg.id = incomingMessage.id;
-        socket.json.send(msg);
+        socket.send(msg);
     }
     getScript() {
         const script = [];
@@ -205,7 +206,7 @@ class APIManager {
             if (!this.apiConfigCache) {
                 this.apiConfigCache = this.getApiConfig();
             }
-            socket.json.send({ event: this.config.initEventName, config: this.apiConfigCache });
+            socket.send({ event: this.config.initEventName, config: this.apiConfigCache });
         }
     }
     createResponse(incomingMessage, socket) {
