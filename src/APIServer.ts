@@ -26,7 +26,13 @@ export class APIServer {
     this.manager.add(this.actions);
 
     if (!this.socket) {
-      const srv = new Server();
+      const srv = new Server({
+        cors: {
+          origin: this.config.url,
+          methods: ['GET', 'POST'],
+          credentials: true,
+        },
+      });
       this.socket = srv.listen(this.port);
     }
     this.manager.setSocket(this.socket);
