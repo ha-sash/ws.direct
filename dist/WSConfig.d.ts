@@ -1,3 +1,4 @@
+import type { ServerOptions } from 'socket.io';
 export declare class WSConfig {
     url: string;
     sessionSecret: string;
@@ -9,5 +10,6 @@ export declare class WSConfig {
     callEventName: string;
     initEventName: string;
     namespace: string;
+    serverOptions?: ServerOptions;
     constructor(cfg?: any);
 }

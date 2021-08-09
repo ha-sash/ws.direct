@@ -1,3 +1,5 @@
+import type { ServerOptions } from 'socket.io';
+
 export class WSConfig {
 
   public url = 'http://localhost:3000/';
@@ -10,6 +12,7 @@ export class WSConfig {
   public callEventName = 'api:call';
   public initEventName = 'api:init';
   public namespace = 'wsdirect';
+  public serverOptions?: ServerOptions;
 
   constructor(cfg: any = {}) {
     Object.assign(this, cfg);

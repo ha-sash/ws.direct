@@ -1,4 +1,4 @@
-import { Server } from 'socket.io';
+import { Server, ServerOptions } from 'socket.io';
 
 import { APIManager } from './APIManager';
 import { WSConfig } from './WSConfig';
@@ -26,13 +26,7 @@ export class APIServer {
     this.manager.add(this.actions);
 
     if (!this.socket) {
-      const srv = new Server({
-        cors: {
-          origin: this.config.url,
-          methods: ['GET', 'POST'],
-          credentials: true,
-        },
-      });
+      const srv = new Server(this.config.serverOptions);
       this.socket = srv.listen(this.port);
     }
     this.manager.setSocket(this.socket);
