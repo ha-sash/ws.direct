@@ -2,6 +2,9 @@ import { APIManager } from './APIManager';
 import { WSConfig } from './WSConfig';
 export declare class APIServer {
     private port;
+    info: (...data: any[]) => void;
+    warn: (...data: any[]) => void;
+    error: (...data: any[]) => void;
     private manager;
     private socket;
     private readonly config;

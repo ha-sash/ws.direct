@@ -18,10 +18,13 @@ class APIClient {
         }
         return new Promise((resolve, reject) => {
             try {
-                this.client = new public_1.WSDirectClient({ url: this.url, autoPublicate: false }, undefined, (c) => {
+                this.client = new public_1.WSDirectClient({
+                    url: this.url,
+                    autoPublish: false
+                }, undefined, (c) => {
                     resolve(c);
                     this.onInited();
-                });
+                }, reject);
             }
             catch (err) {
                 reject(err);

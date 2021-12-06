@@ -3,10 +3,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.APIServer = void 0;
 const socket_io_1 = require("socket.io");
 const APIManager_1 = require("./APIManager");
+const logs_1 = require("./utils/logs");
 const WSConfig_1 = require("./WSConfig");
 class APIServer {
     constructor(config, port = 3500) {
         this.port = port;
+        this.info = logs_1.info;
+        this.warn = logs_1.warn;
+        this.error = logs_1.error;
         this.actions = {};
         if (!config) {
             this.config = new WSConfig_1.WSConfig();
@@ -37,6 +41,7 @@ class APIServer {
     }
     add(actionName, action) {
         this.actions[actionName] = action;
+        this.info('');
     }
 }
 exports.APIServer = APIServer;

@@ -11,5 +11,8 @@ export declare class WSConfig {
     initEventName: string;
     namespace: string;
     serverOptions?: ServerOptions;
+    info?: (...data: any[]) => void;
+    warn?: (...data: any[]) => void;
+    error?: (...data: any[]) => void;
     constructor(cfg?: any);
 }

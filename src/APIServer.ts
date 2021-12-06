@@ -23,8 +23,6 @@ export class APIServer {
     } else {
       this.config = config;
     }
-    const x = {...{url} = this.config};
-    //Object.assign(this, ();
   }
 
   public async run(server?: any) {

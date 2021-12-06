@@ -21,10 +21,18 @@ export class APIClient {
 
     return new Promise((resolve: any, reject: any) => {
       try {
-        this.client = new WSDirectClient({url: this.url, autoPublish: false}, undefined, (c) => {
-          resolve(c);
-          this.onInited();
-        });
+        this.client = new WSDirectClient(
+          {
+            url: this.url,
+            autoPublish: false
+          },
+          undefined,
+          (c) => {
+            resolve(c);
+            this.onInited();
+          },
+          reject,
+        );
       } catch (err) {
         reject(err);
       }
