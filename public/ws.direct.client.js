@@ -1,4 +1,4 @@
-var WSDirectClient = function(config, socketio, onConnectCb) {
+var WSDirectClient = function(config, socketio, onConnectCb, onConnectErrorCb) {
 
     /**
      * @property defaultNamespace {string}
@@ -95,7 +95,7 @@ var WSDirectClient = function(config, socketio, onConnectCb) {
 
         if (msg.event !== undefined && msg.event === defaultApiInitEventName && msg.config) {
             me.addProvider(msg.config);
-            if (config.autoPublicate !== false) {
+            if (config.autoPublish !== false) {
                 me.publicToNamespace(msg.config);
             }
             me.onInit(me);
@@ -367,6 +367,7 @@ var WSDirectClient = function(config, socketio, onConnectCb) {
     };
 
     this.onInit = onConnectCb ? onConnectCb : function() {} ;
+    this.onError = onConnectErrorCb ? onConnectErrorCb : function() {} ;
 
     if (typeof config === 'string' || !config.actions) {
         socket.on('connect', function(msg) {
@@ -377,7 +378,7 @@ var WSDirectClient = function(config, socketio, onConnectCb) {
     } else {
         if (config !== undefined) {
             this.addProvider(config);
-            if (config.autoPublicate !== false) {
+            if (config.autoPublish !== false) {
                 this.publicToNamespace(config);
             }
             this.onInit(this);
@@ -386,6 +387,8 @@ var WSDirectClient = function(config, socketio, onConnectCb) {
     }
 
     //socket.on('disconnect', function(msg) {});
+
+    socket.on('connect_error', this.onError);
 
 };
 

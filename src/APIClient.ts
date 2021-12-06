@@ -21,7 +21,7 @@ export class APIClient {
 
     return new Promise((resolve: any, reject: any) => {
       try {
-        this.client = new WSDirectClient({url: this.url, autoPublicate: false}, undefined, (c) => {
+        this.client = new WSDirectClient({url: this.url, autoPublish: false}, undefined, (c) => {
           resolve(c);
           this.onInited();
         });

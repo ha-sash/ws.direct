@@ -14,6 +14,10 @@ export class WSConfig {
   public namespace = 'wsdirect';
   public serverOptions?: ServerOptions;
 
+  public info?: (...data: any[]) => void;
+  public warn?: (...data: any[]) => void;
+  public error?: (...data: any[]) => void;
+
   constructor(cfg: any = {}) {
     Object.assign(this, cfg);
   }

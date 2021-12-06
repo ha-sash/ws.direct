@@ -1,9 +1,14 @@
 import { Server, ServerOptions } from 'socket.io';
 
 import { APIManager } from './APIManager';
+import { error, info, warn } from './utils/logs';
 import { WSConfig } from './WSConfig';
 
 export class APIServer {
+
+  public info = info;
+  public warn = warn;
+  public error = error;
 
   private manager!: APIManager;
   private socket!: any;
@@ -18,6 +23,8 @@ export class APIServer {
     } else {
       this.config = config;
     }
+    const x = {...{url} = this.config};
+    //Object.assign(this, ();
   }
 
   public async run(server?: any) {
@@ -43,6 +50,7 @@ export class APIServer {
 
   public add(actionName: string, action: object): void {
     this.actions[actionName] = action;
+    this.info('');
   }
 
 }
